@@ -247,11 +247,12 @@ with open('input_genbank.txt', 'r') as fileIn:
 	for line in fileIn:
 		if line[0]!='#':
 			Line=line.rstrip().split('\t')
-			if Line[18]=='identical':
-				if Line[17] in accnr_list_dict:
-					bioDict_gen[Line[1]]=Line[0]
-					accnr_list_dict_gen[Line[0]]= accnr_list_dict[Line[17]]
-					assemblyName_GCA[Line[0]]=Line[17]
+			if len(Line)>19:
+				if Line[18]=='identical':
+					if Line[17] in accnr_list_dict:
+						bioDict_gen[Line[1]]=Line[0]
+						accnr_list_dict_gen[Line[0]]= accnr_list_dict[Line[17]]
+						assemblyName_GCA[Line[0]]=Line[17]
 
 bioDict.update(bioDict_gen)
 accnr_list_dict.update(accnr_list_dict_gen)
@@ -560,12 +561,13 @@ raw=open(al).read().strip()
 d={}
 
 for line in raw.split("\n"):
-	#print line
-    index= int(line.split("\t")[0])
-	#print index
-    actxt=line.split("\t")[1].replace(",","").replace("[","").replace("]","").replace("'","")
-    actlist=actxt.split(" ")
-    d[index]=(actlist)
+	if line.split("\t")[1]!='[]':
+		#print line
+		index= int(line.split("\t")[0])
+		#print index
+		actxt=line.split("\t")[1].replace(",","").replace("[","").replace("]","").replace("'","")
+		actlist=actxt.split(" ")
+		d[index]=(actlist)
 
 
 i=1
