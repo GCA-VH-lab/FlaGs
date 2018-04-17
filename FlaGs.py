@@ -563,9 +563,6 @@ index=0
 for line in raw.split("\n"):
 	if line.split("\t")[1]!='[]':
 		index+=1
-		#print line
-		#index= int(line.split("\t")[0])
-		#print index
 		actxt=line.split("\t")[1].replace(",","").replace("[","").replace("]","").replace("'","")
 		actlist=actxt.split(" ")
 		d[index]=(actlist)
@@ -800,7 +797,7 @@ if not args.tree:
 
 if args.tree:###Tree Command###
 	tree_file= args.out_prefix+'_tree.fasta'
-	tree_command="ete3 build -w standard_trimmed_fasttree -a %s -o %s --clearall" %(tree_file, tree_file[:-6])
+	tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full" %(tree_file, tree_file[:-6])
 	#print(tree_command)
 	os.system(tree_command)
 	from ete3 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
@@ -837,7 +834,7 @@ if args.tree:###Tree Command###
 	nwTree=''
 	motifDict={}
 	motifDict_2={}
-	with open(args.out_prefix+'_tree/clustalo_default-trimal01-none-fasttree_full/'+args.out_prefix+'_tree.fasta.final_tree.nw', 'r') as treeIn:
+	with open(args.out_prefix+'_tree/mafft_default-trimal01-none-fasttree_full/'+args.out_prefix+'_tree.fasta.final_tree.nw', 'r') as treeIn:
 		for line in treeIn:
 			nwTree=line
 			for items in line.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
