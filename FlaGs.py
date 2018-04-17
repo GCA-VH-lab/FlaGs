@@ -559,11 +559,12 @@ outacclists.close()
 raw=open(al).read().strip()
 
 d={}
-
+index=0
 for line in raw.split("\n"):
 	if line.split("\t")[1]!='[]':
+		index+=1
 		#print line
-		index= int(line.split("\t")[0])
+		#index= int(line.split("\t")[0])
 		#print index
 		actxt=line.split("\t")[1].replace(",","").replace("[","").replace("]","").replace("'","")
 		actlist=actxt.split(" ")
