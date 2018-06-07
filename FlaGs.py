@@ -6,6 +6,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein, IUPAC
 import argparse
+import random
 import ftplib
 import os, sys, os.path, math
 import gzip
@@ -299,15 +300,20 @@ with open (args.out_prefix+'_NameError.txt', 'w') as fbad:
 				ne+=1
 				print(query[0], file= fbad)
 
+				
 nai=0
 NqueryDict={}
 with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
-	for query in queryDict:
-		if queryDict[query]!='NAI':
-			NqueryDict[query]=queryDict[query]
-		else:
-			print(query, file=fNai)
-			nai+=1
+        for query in queryDict:
+                if queryDict[query]!='NAI':
+                        if args.redundant:
+                                NqueryDict[query]=queryDict[query]
+                        else:
+                                NqueryDict[query]=random.sample(queryDict[query],1)
+                else:
+                        print(query, file=fNai)
+                        nai+=1
+
 
 newQ=0
 for query in NqueryDict:
