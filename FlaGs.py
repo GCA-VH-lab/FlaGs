@@ -1,12 +1,12 @@
 #Author: Chayan Kumar Saha, Gemma C. Atkinson
 #Chayan
+import random
 from Bio import SeqIO
 from Bio import Entrez
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein, IUPAC
 import argparse
-import random
 import ftplib
 import os, sys, os.path, math
 import gzip
@@ -20,6 +20,7 @@ usage= ''' Description:  Identify flanking genes and cluster them based on simil
 parser = argparse.ArgumentParser(description=usage)
 parser.add_argument("-a", "--assemblyList", help="Protein Accession with assembly Identifier eg. GCF_000001765.3 in a text file separated by newline")
 parser.add_argument("-p", "--proteinList", help="Protein Accession eg. XP_ or WP_047256880.1 in a text file separated by newline")
+parser.add_argument("-r", "--redundant",action="store_true", help="Search all GCFs for each query")
 parser.add_argument("-e", "--ethreshold", help="E value threshold. Default = 1e-10")
 parser.add_argument("-n", "--number", help="Number of Jackhmmer iterations. Default = 3")
 parser.add_argument("-s", "--strand", help="Number of strand for looking up or downstream. Default = 4")
@@ -215,6 +216,8 @@ def downs(item):
 		return '-'
 
 
+
+
 ftp = ftplib.FTP('ftp.ncbi.nih.gov', 'anonymous', 'anonymous@ftp.ncbi.nih.gov')
 ftp.cwd("/genomes/refseq") # move to refseq directory
 
@@ -300,20 +303,18 @@ with open (args.out_prefix+'_NameError.txt', 'w') as fbad:
 				ne+=1
 				print(query[0], file= fbad)
 
-				
 nai=0
 NqueryDict={}
 with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
-        for query in queryDict:
-                if queryDict[query]!='NAI':
-                        if args.redundant:
-                                NqueryDict[query]=queryDict[query]
-                        else:
-                                NqueryDict[query]=random.sample(queryDict[query],1)
-                else:
-                        print(query, file=fNai)
-                        nai+=1
-
+	for query in queryDict:
+		if queryDict[query]!='NAI':
+			if args.redundant:
+				NqueryDict[query]=queryDict[query]
+			else:
+				NqueryDict[query]=random.sample(queryDict[query],1)
+		else:
+			print(query, file=fNai)
+			nai+=1
 
 newQ=0
 for query in NqueryDict:
@@ -336,6 +337,7 @@ LengthDict={} #Length of each query
 with open(args.out_prefix+'_flankgene.tsv', 'w') as ftab:
 	count=0
 	for query in NqueryDict:
+		#query, NqueryDict[query] : WP_000004567.1#1 {'GCF_001296435.1', 'GCF_000585975.1', 'GCF_000161735.1', 'GCF_001429475.1', 'GCF_000292705.1'}
 		count+=1
 		if args.verbose:
 			print('\n'+'> '+str(count)+' in process out of '+str(newQ)+' ... '+'\n')
