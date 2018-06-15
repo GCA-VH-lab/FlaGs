@@ -1,17 +1,19 @@
 #Author: Chayan Kumar Saha, Gemma C. Atkinson
 #Chayan
-import random
 from Bio import SeqIO
 from Bio import Entrez
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein, IUPAC
+import random
 import argparse
 import ftplib
 import os, sys, os.path, math
 import gzip
 import getopt
 from collections import OrderedDict
+from tkinter import *
+import subprocess
 Entrez.email = "gemma.atkinson@gmail.com"
 
 usage= ''' Description:  Identify flanking genes and cluster them based on similarity and visualize the structure; Requirement= Python3, BioPython; tkinter ; Optional Requirement= ETE3'''
@@ -27,6 +29,7 @@ parser.add_argument("-s", "--strand", help="Number of strand for looking up or d
 parser.add_argument("-t", "--tree", action="store_true", help="If you want to see flanking genes along with phylogenetic tree, requires ETE3 installation. By default it will not produce.")
 parser.add_argument("-ts", "--tshape", help="Size of triangle shapes that represent flanking genes, this option only works when -t is used. Default = 12 ")
 parser.add_argument("-tf", "--tfontsize", help="Size of font inside triangles that represent flanking genes, this option only works when -t is used. Default = 4 ")
+parser.add_argument("-to", "--tree_order", action="store_true", help="Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-o", "--out_prefix", required= True, help="Any Keyword to define your output eg. MyQuery")
 parser.add_argument("-k", "--keep", action="store_true", help="If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove.")
 parser.add_argument("-v", "--version", action="version", version='%(prog)s 5.0')
@@ -216,8 +219,6 @@ def downs(item):
 		return '-'
 
 
-
-
 ftp = ftplib.FTP('ftp.ncbi.nih.gov', 'anonymous', 'anonymous@ftp.ncbi.nih.gov')
 ftp.cwd("/genomes/refseq") # move to refseq directory
 
@@ -315,7 +316,6 @@ with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
 		else:
 			print(query, file=fNai)
 			nai+=1
-
 newQ=0
 for query in NqueryDict:
 	newQ+=1
@@ -337,7 +337,6 @@ LengthDict={} #Length of each query
 with open(args.out_prefix+'_flankgene.tsv', 'w') as ftab:
 	count=0
 	for query in NqueryDict:
-		#query, NqueryDict[query] : WP_000004567.1#1 {'GCF_001296435.1', 'GCF_000585975.1', 'GCF_000161735.1', 'GCF_001429475.1', 'GCF_000292705.1'}
 		count+=1
 		if args.verbose:
 			print('\n'+'> '+str(count)+' in process out of '+str(newQ)+' ... '+'\n')
@@ -463,7 +462,10 @@ else:
 	else:    ## Show an error ##
 		print("Error: %s file not found" % myfile)
 
-
+if args.keep:
+	pass
+else:
+	subprocess.Popen("rm GCF*.gz", shell=True)
 
 
 flankF=0
@@ -690,6 +692,7 @@ colorDict.update(color)
 maxs=(int(s)-1)
 mins=maxs-(maxs*2)
 
+
 if not args.tree:
 	nPos=[]
 	pPos=[]
@@ -736,10 +739,8 @@ if not args.tree:
 	#heightM= 5000
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*40
-	from tkinter import *
 
 	master = Tk()
-
 
 	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
 	hbar=Scrollbar(master,orient=HORIZONTAL)
@@ -803,6 +804,7 @@ if not args.tree:
 	retval = canvas.postscript(file=args.out_prefix+"_flankgenes.ps", height=heightM, width=widthM, colormode="color")
 	mainloop()
 
+
 if args.tree:###Tree Command###
 	tree_file= args.out_prefix+'_tree.fasta'
 	tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full" %(tree_file, tree_file[:-6])
@@ -838,15 +840,19 @@ if args.tree:###Tree Command###
 	for ln in range(len(udList)):
 		startDict[udList[ln]]=sList[ln]
 
+	#WP_071976325.1#5_Bacillus_oleronius:0.266349
 	#print(startDict)
+
 	nwTree=''
 	motifDict={}
 	motifDict_2={}
+	treeOrderList=[]
 	with open(args.out_prefix+'_tree/mafft_default-trimal01-none-fasttree_full/'+args.out_prefix+'_tree.fasta.final_tree.nw', 'r') as treeIn:
 		for line in treeIn:
 			nwTree=line
 			for items in line.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
 				item=items.split('_')[0]+'_'+items.split('_')[1]
+				treeOrderList.append(item)
 				simple_motifs=[]
 				simple_motifs_2=[]
 				for keys in sorted(startDict):
@@ -887,15 +893,131 @@ if args.tree:###Tree Command###
 		ts = TreeStyle()
 		ts.tree_width = 300
 		ts.show_branch_support = True
-		t.show(tree_style=ts)
-		t.render(args.out_prefix+"_flankgenes_1.svg",tree_style=ts)
+		if args.tree_order:
+			t.render(args.out_prefix+"_flankgenes_1.svg",tree_style=ts)
+		else:
+			t.show(tree_style=ts)
+			t.render(args.out_prefix+"_flankgenes_1.svg",tree_style=ts)
 
 	if __name__ == '__main__':
 		t = get_example_tree_2()
 		ts = TreeStyle()
 		ts.tree_width = 300
 		ts.show_branch_support = True
-		t.show(tree_style=ts)
-		t.render(args.out_prefix+"_flankgenes_2.svg", tree_style=ts)
+		if args.tree_order:
+			t.render(args.out_prefix+"_flankgenes_2.svg", tree_style=ts)
+		else:
+			t.show(tree_style=ts)
+			t.render(args.out_prefix+"_flankgenes_2.svg", tree_style=ts)
+
+if args.tree and args.tree_order:
+	ntPos=[]
+	ptPos=[]
+	with open(args.out_prefix+'_TreeOrder_operon.tsv', 'w') as opOut:
+		for queries in treeOrderList:
+			for items in sorted(accFlankDict[queries]):
+				if queryStrand[queries]=='+':
+					ids=accFlankDict[queries][items][:-1]
+					lengths=LengthDict[accFlankDict[queries][items][:-1]]
+					species=queries+'_'+speciesDict[queries].replace(' ','_').replace(':','_').replace('[','_').replace(']','_')
+					qStrand=queryStrand[queries]
+					nStrand=accFlankDict[queries][items][-1]
+					family=familyDict[accFlankDict[queries][items][:-1].split('#')[0]]
+					startPos=int(positionDict[accFlankDict[queries][0][:-1]].split('\t')[0])-1
+					start=int(positionDict[accFlankDict[queries][items][:-1]].split('\t')[0])
+					end=int(positionDict[accFlankDict[queries][items][:-1]].split('\t')[1])
+					print(species, lengths, qStrand, nStrand, family, start-startPos, end-startPos, start, end, ids, sep='\t', file=opOut)
+					nP=start-startPos
+					pP=end-startPos
+					ntPos.append(nP)
+					ptPos.append(pP)
+
+				else:
+					ids=accFlankDict[queries][items][:-1]
+					lengths=LengthDict[accFlankDict[queries][items][:-1]]
+					species=queries+'_'+speciesDict[queries].replace(' ','_').replace(':','_').replace('[','_').replace(']','_')
+					qStrand=queryStrand[queries]
+					nStrand=accFlankDict[queries][items][-1]
+					family=familyDict[accFlankDict[queries][items][:-1].split('#')[0]]
+					startPos=startPos=int(positionDict[accFlankDict[queries][0][:-1]].split('\t')[1])+1
+					start=int(positionDict[accFlankDict[queries][items][:-1]].split('\t')[1])
+					end=int(positionDict[accFlankDict[queries][items][:-1]].split('\t')[0])
+					print(species, lengths, qStrand, nStrand, family, startPos-start, startPos-end, end, start, ids, sep='\t', file=opOut)
+					nP=startPos-start
+					pP=startPos-end
+					ntPos.append(nP)
+					ptPos.append(pP)
+
+			print('\n\n', file=opOut)
+
+	windowMost=round(((max(ptPos)+abs(min(ntPos))+1)*4)/100)
+	#print(windowMost)
+	#widthM= 5000
+	#heightM= 5000
+	widthM=(windowMost*3)+500
+	heightM=int(newQ)*40
+	master = Tk()
+
+
+	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
+	hbar=Scrollbar(master,orient=HORIZONTAL)
+	hbar.pack(side=BOTTOM,fill=X)
+	hbar.config(command=canvas.xview)
+	vbar=Scrollbar(master,orient=VERTICAL)
+	vbar.pack(side=RIGHT,fill=Y)
+	vbar.config(command=canvas.yview)
+	#canvas.config(width=1500,height=1000)
+	canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+	canvas.pack(side=LEFT,expand=True,fill=BOTH)
+
+	def operonFamily(item):
+		if item==0:
+			return ' '
+		elif item==center:
+			return ' '
+		elif item==noProt:
+			return ' '
+		else:
+			return item
+
+
+	eg1=open(args.out_prefix+'_TreeOrder_operon.tsv','r').read()
+
+	egs=eg1.split("\n\n\n\n")
+	line_pos_y=0
+	for eg in egs:
+		if eg!='':
+			coln=0
+			entries=eg.splitlines()
+			ndoms=len(entries)
+			ptnstats=entries[0].split("\t")
+			org=ptnstats[0].replace ("_"," ")
+			textspace=widthM/2
+			line_pos_y=line_pos_y+ 25
+			half_dom_height=8
+			ptn_len=ptnstats[5]
+			text = canvas.create_text(textspace/2,line_pos_y, text=org, fill="#404040", font=("Arial", "12"))
+
+			for entry in entries:
+				items=entry.split("\t")
+				aln_start=round(int(items[5])*4/100)
+				aln_end=round(int(items[6])*4/100)
+				hmm_name=int(items[4])
+				strandType=items[3]
+				dom1_name=hmm_name
+				dom1_len=(aln_end-aln_start)
+				oL80=round(dom1_len*80/100)
+				dom1_start=aln_start+textspace
+				dom1_end=dom1_len+dom1_start
+				if strandType=='+':
+					rect = canvas.create_polygon(dom1_start, line_pos_y+half_dom_height, dom1_start, line_pos_y-half_dom_height,dom1_start+oL80, line_pos_y-half_dom_height, dom1_end, line_pos_y, dom1_start+oL80, line_pos_y+half_dom_height,fill=colorDict[dom1_name], outline=outliner(colorDict[dom1_name]))
+				else:
+					rect = canvas.create_polygon(dom1_end-oL80, line_pos_y+half_dom_height, dom1_start, line_pos_y, dom1_end-oL80, line_pos_y-half_dom_height,dom1_end, line_pos_y-half_dom_height, dom1_end, line_pos_y+half_dom_height, fill=colorDict[dom1_name], outline=outliner(colorDict[dom1_name]))
+				textd1 = canvas.create_text(dom1_start+(dom1_len/2),line_pos_y, text=operonFamily(dom1_name), font=("Arial", "7"))
+				coln=coln+1
+
+	retval = canvas.postscript(file=args.out_prefix+"_treeOrder_flankgenes.ps", height=heightM, width=widthM, colormode="color")
+	mainloop()
+
 
 print('\n'+'<<< Done >>>')
