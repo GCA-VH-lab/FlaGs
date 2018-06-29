@@ -443,6 +443,15 @@ with open(args.out_prefix+'_flankgene.tsv', 'w') as ftab:
 				if args.verbose:
 					print('\t', 'Corresponding Assembly ID', item, 'does not exist in NCBI Refseq', '\n')
 
+#accFlankDict
+'''
+{'WP_000004567.1#1': {0: 'WP_000004567.1#1+', -1: 'WP_000931496.1#1+', -2: 'WP_003310314.1#1+', -3: 'WP_033795253.1#1-', -4: 'WP_000153877.1#1+', 1: 'WP_000342211.1#1-', 2: 'WP_000708631.1#1-', 3: 'WP_000291520.1#1-', 4: 'WP_000572582.1#1-'}}
+'''
+allFlankGeneList=[]
+for keys in accFlankDict:
+	for item in accFlankDict[keys]:
+		allFlankGeneList.append(accFlankDict[keys][item].split('#')[0])
+#print(allFlankGeneList)
 
 myfile="./input.txt" # for deletion of the downloaded file from ftp
 if args.keep:
@@ -596,20 +605,28 @@ while i<len(d)+1:	#use i and j to iterate through the combinations
 
 
 #print("==")
+#d : {1: ['WP_000153877.1'], 2: [], 3: ['WP_000291520.1'], 4: ['WP_000342211.1'], 5: [],... 30: ['WP_055032751.1', 'WP_001246052.1']}
 
-outfile=open(infilename+"_"+iters+"_"+evthresh+"_clusters.tsv","w")
+trueAccessionCount={}
+for keys in d:
+	numbers=[]
+	for item in d[keys]:
+		numbers.append(allFlankGeneList.count(item))
+	trueAccessionCount[(';'.join(map(str,d[keys])))]=sum(numbers)
 
+#trueAccessionCount: 'WP_001229260.1;WP_001229255.1': 4
+odtrue=OrderedDict(sorted(trueAccessionCount.items(), key= lambda item:item[1],reverse=True))
+print(odtrue)
 
-od=OrderedDict(sorted(d.items(), key= lambda item:len(item[1]),reverse=True))
 
 familyNumber=0
 with open(infilename+"_"+iters+"_"+evthresh+"_clusters.tsv","w") as clusOut:
-	for k, v in od.items():
-		#print (k, od[k])
-		if len(od[k])>0:
+	for k, v in odtrue.items():
+		#print (k.split(';'), odtrue[k], v)
+		if len(k.split(';'))>0 and v>0:
 			familyNumber+=1
-			print(str(familyNumber),str(len(od[k])),(';'.join(map(str,od[k]))), sep='\t', file=clusOut)
-			k=k+1
+			print(str(familyNumber),str(odtrue[k]),k, sep='\t', file=clusOut)
+#			k=k+1
 
 
 outfile_des=open(infilename+"_"+iters+"_"+evthresh+"_outdesc.txt","w")
@@ -619,12 +636,16 @@ acclists=inf.read().splitlines()
 for line in acclists:
 	acclist=line.split("\t")[2].split(";")
 	familyAssignedValue=line.split("\t")[0]
-	if len(acclist)>1:
+	if int(line.split("\t")[1])>1:
 		for acc in acclist:
             #print (acc, "\t", desDict[acc])
-			outfile_des.write(familyAssignedValue+"\t"+acc+"\t"+desDict[acc]+"\n")
+			outfile_des.write(familyAssignedValue+'('+str(allFlankGeneList.count(acc))+')'+"\t"+acc+"\t"+desDict[acc]+"\n")
         #print ("\n\n")
 		outfile_des.write ("\n\n")
+'''
+with open (infilename+"_"+iters+"_"+evthresh+"_outdesc.txt","r") as desIn:
+	for line in desIn:
+'''
 
 import random
 from random import randint
