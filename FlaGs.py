@@ -13,6 +13,7 @@ import gzip
 import getopt
 from collections import OrderedDict
 from tkinter import *
+master = Tk()
 import subprocess
 Entrez.email = "gemma.atkinson@gmail.com"
 
@@ -761,7 +762,7 @@ if not args.tree:
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*40
 
-	master = Tk()
+	#master = Tk()
 
 	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
 	hbar=Scrollbar(master,orient=HORIZONTAL)
@@ -977,7 +978,7 @@ if args.tree and args.tree_order:
 	#heightM= 5000
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*40
-	master = Tk()
+	#master = Tk()
 
 
 	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
