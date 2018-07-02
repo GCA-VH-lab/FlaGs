@@ -1,0 +1,197 @@
+1(1)	WP_016422970.1	MULTISPECIES: malto-oligosyltrehalose synthase 
+1(1)	WP_050776597.1	glycogen debranching enzyme GlgX 
+1(1)	WP_051866886.1	glycogen debranching enzyme GlgX 
+1(2)	WP_049155312.1	MULTISPECIES: glycogen debranching enzyme GlgX 
+1(1)	WP_040086187.1	malto-oligosyltrehalose synthase 
+1(1)	WP_038608258.1	malto-oligosyltrehalose synthase 
+1(1)	WP_040086191.1	malto-oligosyltrehalose trehalohydrolase 
+1(1)	WP_066487121.1	MULTISPECIES: glycogen debranching enzyme GlgX 
+1(1)	WP_070497141.1	glycogen debranching enzyme GlgX 
+1(1)	WP_070767270.1	malto-oligosyltrehalose synthase 
+1(1)	WP_016422968.1	glycogen debranching enzyme GlgX 
+1(1)	WP_049193987.1	MULTISPECIES: glycogen debranching enzyme GlgX 
+
+
+2(1)	WP_070546804.1	MULTISPECIES: hypothetical protein 
+2(1)	WP_066588919.1	hypothetical protein 
+2(2)	WP_005510313.1	MULTISPECIES: hypothetical protein 
+2(1)	WP_061923691.1	MULTISPECIES: hypothetical protein 
+2(1)	WP_066487265.1	MULTISPECIES: hypothetical protein 
+2(1)	WP_038606090.1	hypothetical protein 
+2(1)	WP_070515717.1	MULTISPECIES: hypothetical protein 
+2(1)	WP_005278507.1	MULTISPECIES: hypothetical protein 
+2(1)	WP_040087499.1	hypothetical protein 
+2(1)	WP_005328831.1	hypothetical protein 
+
+
+3(1)	WP_070566053.1	MULTISPECIES: YigZ family protein 
+3(1)	WP_070497130.1	YigZ family protein 
+3(1)	WP_038606093.1	YigZ family protein 
+3(1)	WP_040087500.1	YigZ family protein 
+3(1)	WP_046647993.1	MULTISPECIES: YigZ family protein 
+3(1)	WP_071409976.1	YigZ family protein 
+3(1)	WP_066588922.1	DUF1949 domain-containing protein 
+3(1)	WP_066487128.1	MULTISPECIES: YigZ family protein 
+3(1)	WP_042389386.1	MULTISPECIES: YigZ family protein 
+3(1)	WP_005328833.1	YigZ family protein 
+3(1)	WP_005283783.1	MULTISPECIES: YigZ family protein 
+
+
+4(1)	WP_040086186.1	DNA polymerase III subunit epsilon 
+4(1)	WP_016422969.1	hypothetical protein 
+4(1)	WP_070701766.1	DNA polymerase III subunit epsilon 
+4(1)	WP_070515713.1	MULTISPECIES: DNA polymerase III subunit epsilon 
+4(1)	WP_070767269.1	DNA polymerase III subunit epsilon 
+4(1)	WP_078057428.1	hypothetical protein 
+4(1)	WP_051866887.1	hypothetical protein 
+4(1)	WP_005328826.1	DNA polymerase III subunit epsilon 
+4(1)	WP_068802200.1	MULTISPECIES: DNA polymerase III subunit epsilon 
+4(1)	WP_023017268.1	MULTISPECIES: hypothetical protein 
+4(1)	WP_070497138.1	DNA polymerase III subunit epsilon 
+
+
+5(1)	WP_023017265.1	MULTISPECIES: RNA-binding S4 domain-containing protein 
+5(1)	WP_070497132.1	RNA-binding S4 domain-containing protein 
+5(1)	WP_080969602.1	MULTISPECIES: RNA-binding S4 domain-containing protein 
+5(2)	WP_010190494.1	MULTISPECIES: RNA-binding S4 domain-containing protein 
+5(1)	WP_016422972.1	MULTISPECIES: RNA-binding S4 domain-containing protein 
+5(1)	WP_040086189.1	RNA-binding S4 domain-containing protein 
+5(1)	WP_051866888.1	RNA-binding S4 domain-containing protein 
+5(1)	WP_066487127.1	MULTISPECIES: RNA-binding S4 domain-containing protein 
+5(1)	WP_066588917.1	RNA-binding S4 domain-containing protein 
+5(1)	WP_005324575.1	MULTISPECIES: RNA-binding S4 domain-containing protein 
+
+
+6(1)	WP_070497136.1	hypothetical protein 
+6(1)	WP_049155309.1	MULTISPECIES: hypothetical protein 
+6(1)	WP_052437838.1	hypothetical protein 
+6(1)	WP_005328828.1	MULTISPECIES: hypothetical protein 
+6(1)	WP_066487124.1	MULTISPECIES: hypothetical protein 
+6(1)	WP_070512523.1	MULTISPECIES: hypothetical protein 
+6(1)	WP_038606082.1	hypothetical protein 
+6(1)	WP_023017267.1	MULTISPECIES: hypothetical protein 
+
+
+7(1)	WP_066588905.1	TetR/AcrR family transcriptional regulator 
+7(1)	WP_070497146.1	TetR family transcriptional regulator 
+7(1)	WP_049155313.1	MULTISPECIES: TetR family transcriptional regulator 
+7(1)	WP_066487118.1	MULTISPECIES: TetR family transcriptional regulator 
+7(1)	WP_023017269.1	MULTISPECIES: TetR family transcriptional regulator 
+7(1)	WP_005328823.1	TetR family transcriptional regulator 
+7(1)	WP_046647998.1	MULTISPECIES: TetR family transcriptional regulator 
+
+
+8(2)	WP_070515721.1	MULTISPECIES: threonine dehydratase 
+8(1)	WP_070497124.1	threonine dehydratase 
+8(1)	WP_023017264.1	MULTISPECIES: threonine dehydratase 
+8(1)	WP_005328835.1	threonine dehydratase 
+8(1)	WP_066487129.1	MULTISPECIES: threonine dehydratase 
+
+
+9(1)	WP_028275956.1	alpha/beta hydrolase 
+9(1)	WP_052014073.1	alpha/beta hydrolase 
+9(1)	WP_045076151.1	alpha/beta hydrolase 
+9(1)	WP_056428384.1	alpha/beta hydrolase 
+
+
+10(1)	WP_077508808.1	RNA polymerase sigma factor 
+10(1)	WP_091126149.1	hypothetical protein 
+10(1)	WP_026862764.1	hypothetical protein 
+10(1)	WP_076262408.1	hypothetical protein 
+
+
+11(1)	WP_026862762.1	LysE family translocator 
+11(1)	WP_028660107.1	leucine efflux protein LeuE 
+11(1)	WP_076262412.1	LysE family translocator 
+
+
+12(1)	WP_082553258.1	DinB family protein 
+12(1)	WP_026862763.1	DinB family protein 
+12(1)	WP_076262410.1	DinB family protein 
+
+
+13(1)	WP_038566073.1	MULTISPECIES: cytochrome P450 
+13(1)	WP_085872310.1	MULTISPECIES: cytochrome P450 
+13(1)	WP_006241626.1	cytochrome P450 
+
+
+14(1)	WP_091126140.1	MFS transporter 
+14(1)	WP_036555377.1	MFS transporter 
+14(1)	WP_045824229.1	MFS transporter 
+
+
+15(2)	WP_005510305.1	MULTISPECIES: addiction module antidote protein, HigA family 
+
+
+16(1)	WP_006241629.1	APC family permease 
+16(1)	WP_003879871.1	MULTISPECIES: APC family permease 
+
+
+17(1)	WP_027331955.1	adenylosuccinate lyase 
+17(1)	WP_003879873.1	MULTISPECIES: adenylosuccinate lyase 
+
+
+18(1)	WP_028275958.1	MULTISPECIES: rhodanese-like domain-containing protein 
+18(1)	WP_028275959.1	MBL fold metallo-hydrolase 
+
+
+19(1)	WP_038563220.1	MULTISPECIES: TetR family transcriptional regulator 
+19(1)	WP_006241631.1	TetR family transcriptional regulator 
+
+
+20(1)	WP_003879875.1	MULTISPECIES: C4-dicarboxylate ABC transporter 
+20(1)	WP_040538736.1	C4-dicarboxylate ABC transporter 
+
+
+21(1)	WP_038566070.1	MULTISPECIES: esterase 
+21(1)	WP_040539177.1	esterase 
+
+
+22(1)	WP_045076147.1	bile acid:sodium symporter family protein 
+22(1)	WP_028275952.1	bile acid:sodium symporter family protein 
+
+
+23(1)	WP_028275957.1	Na+/H+ antiporter NhaA 
+23(1)	WP_056428380.1	Na+/H+ antiporter NhaA 
+
+
+24(1)	WP_045076145.1	MarR family transcriptional regulator 
+24(1)	WP_056919408.1	MarR family transcriptional regulator 
+
+
+25(1)	WP_070566030.1	MULTISPECIES: IclR family transcriptional regulator 
+25(1)	WP_016422973.1	MULTISPECIES: hypothetical protein 
+
+
+26(1)	WP_076262398.1	MFS transporter 
+26(1)	WP_026862770.1	MFS transporter 
+
+
+27(1)	WP_026862769.1	PLP-dependent aminotransferase family protein 
+27(1)	WP_076262400.1	PLP-dependent aminotransferase family protein 
+
+
+28(1)	WP_076262404.1	N-acetyltransferase 
+28(1)	WP_034770422.1	N-acetyltransferase 
+
+
+29(1)	WP_076262406.1	hypothetical protein 
+29(1)	WP_026862765.1	hypothetical protein 
+
+
+30(1)	WP_056919412.1	NADP oxidoreductase 
+30(1)	WP_085872314.1	MULTISPECIES: NADP oxidoreductase 
+
+
+31(1)	WP_085872308.1	MULTISPECIES: LLM class F420-dependent oxidoreductase 
+31(1)	WP_091126153.1	LLM class F420-dependent oxidoreductase 
+
+
+32(1)	WP_091126155.1	DUF664 domain-containing protein 
+32(1)	WP_085872307.1	MULTISPECIES: DUF664 domain-containing protein 
+
+
+33(1)	WP_091934896.1	hypothetical protein 
+33(1)	WP_038936642.1	hypothetical protein 
+
+
