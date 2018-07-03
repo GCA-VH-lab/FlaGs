@@ -14,3 +14,12 @@ With tree (Biopython and ETE necessary):
               or 
               
               python FlaGs.py -p accession_input.txt -t -to -o accession_output -vb
+              
+              
+With tree and interactive ETE tree editing window:
+
+              python FlaGs.py -a GCF_accession_input.txt -t -o GCF_accession_output -vb
+              
+              or 
+              
+              python FlaGs.py -p accession_input.txt -t -o accession_output -vb
