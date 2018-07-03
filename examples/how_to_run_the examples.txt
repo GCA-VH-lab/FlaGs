@@ -5,7 +5,7 @@ Without tree (only Biopython neccessary):
 
               or
 
-              python FlaGs.py -p accession_input.txt -o GCF_accession_output -vb
+              python FlaGs.py -p accession_input.txt -o accession_output -vb
 
 With tree (Biopython and ETE necessary):
 
@@ -13,4 +13,4 @@ With tree (Biopython and ETE necessary):
               
               or 
               
-              python FlaGs.py -p accession_input.txt -t -to -o GCF_accession_output -vb
+              python FlaGs.py -p accession_input.txt -t -to -o accession_output -vb
