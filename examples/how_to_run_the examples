@@ -1,0 +1,16 @@
+
+Without tree:
+
+              python FlaGs.py -a GCF_accession_input.txt -o GCF_accession_output -vb
+
+              or
+
+              python FlaGs.py -p accession_input.txt -o GCF_accession_output -vb
+
+With tree (ETE installation necessary)
+
+              python FlaGs.py -a GCF_accession_input.txt -t -to -o GCF_accession_output -vb
+              
+              or 
+              
+              python FlaGs.py -p accession_input.txt -t -to -o GCF_accession_output -vb
