@@ -33,7 +33,7 @@ parser.add_argument("-tf", "--tfontsize", help="Size of font inside triangles th
 parser.add_argument("-to", "--tree_order", action="store_true", help="Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-o", "--out_prefix", required= True, help="Any Keyword to define your output eg. MyQuery")
 parser.add_argument("-k", "--keep", action="store_true", help="If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove.")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 5.0')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.0')
 parser.add_argument("-vb", "--verbose", action="store_true", help="Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
