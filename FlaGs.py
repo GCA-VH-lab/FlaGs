@@ -1,5 +1,5 @@
 #Author: Chayan Kumar Saha, Gemma C. Atkinson
-#Chayan
+
 from Bio import SeqIO
 from Bio import Entrez
 from Bio.Seq import Seq
