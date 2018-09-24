@@ -33,11 +33,15 @@ parser.add_argument("-tf", "--tfontsize", help="Size of font inside triangles th
 parser.add_argument("-to", "--tree_order", action="store_true", help="Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-o", "--out_prefix", required= True, help="Any Keyword to define your output eg. MyQuery")
 parser.add_argument("-k", "--keep", action="store_true", help="If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove.")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.0')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.1')
 parser.add_argument("-vb", "--verbose", action="store_true", help="Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
 
+if args.assemblyList:
+	if args.redundant:
+		print('"-r" option is only works with "-p", please try again with proper command')
+		sys.exit()
 
 if args.tree:
 	if args.tshape:
@@ -139,7 +143,6 @@ def accession_from_wp(accession_nr):
 	"""
 	:param accession_nr: NCBI protein accession
 	:return: Set of assembly number of all species for particular protein
-
 	"""
 	Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
 	# blocked, warning is sent to this email.
@@ -305,11 +308,12 @@ with open (args.out_prefix+'_NameError.txt', 'w') as fbad:
 				ne+=1
 				print(query[0], file= fbad)
 
+#print(queryDict)
 nai=0
 NqueryDict={}
 with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
 	for query in queryDict:
-		if queryDict[query]!='NAI':
+		if len(queryDict[query])!=0:
 			if args.redundant:
 				NqueryDict[query]=queryDict[query]
 			else:
@@ -617,7 +621,7 @@ for keys in d:
 
 #trueAccessionCount: 'WP_001229260.1;WP_001229255.1': 4
 odtrue=OrderedDict(sorted(trueAccessionCount.items(), key= lambda item:item[1],reverse=True))
-print(odtrue)
+#print(odtrue)
 
 
 familyNumber=0
@@ -643,10 +647,7 @@ for line in acclists:
 			outfile_des.write(familyAssignedValue+'('+str(allFlankGeneList.count(acc))+')'+"\t"+acc+"\t"+desDict[acc]+"\n")
         #print ("\n\n")
 		outfile_des.write ("\n\n")
-'''
-with open (infilename+"_"+iters+"_"+evthresh+"_outdesc.txt","r") as desIn:
-	for line in desIn:
-'''
+
 
 import random
 from random import randint
