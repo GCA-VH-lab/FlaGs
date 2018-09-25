@@ -1,5 +1,4 @@
 #Author: Chayan Kumar Saha, Gemma C. Atkinson
-
 from Bio import SeqIO
 from Bio import Entrez
 from Bio.Seq import Seq
@@ -143,6 +142,7 @@ def accession_from_wp(accession_nr):
 	"""
 	:param accession_nr: NCBI protein accession
 	:return: Set of assembly number of all species for particular protein
+
 	"""
 	Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
 	# blocked, warning is sent to this email.
@@ -157,10 +157,13 @@ def accession_from_wp(accession_nr):
 		if "ProteinList" in record[0]:
 			for keys in (record[0]["ProteinList"]):
 				assembly=[]
-				for item in keys["CDSList"]:
-					if "assembly" in item.attributes :
-						assembly.append(item.attributes["assembly"])
-				return set(assembly)
+				if "CDSList" in keys:
+					for item in keys["CDSList"]:
+						if "assembly" in item.attributes :
+							assembly.append(item.attributes["assembly"])
+					return set(assembly)
+				else:
+					return("NAI")
 		else:
 			return("NAI")
 	else:
@@ -479,7 +482,8 @@ else:
 if args.keep:
 	pass
 else:
-	subprocess.Popen("rm GCF*.gz", shell=True)
+	subprocess.Popen("rm G*F*.gz", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
 
 
 flankF=0
