@@ -287,7 +287,8 @@ with open (args.out_prefix+'_NameError.txt', 'w') as fbad:
 			elif query[0][:2]=='XP':
 				assemList=[]
 				for bioprojs in accession_from_xp(query[0]):
-					assemList.append(bioDict[bioprojs])
+					if bioprojs in bioDict: #to avoid key error
+						assemList.append(bioDict[bioprojs])
 				queryDict[query[0]+'#'+str(q)]=set(assemList)
 			else:
 				ne+=1
