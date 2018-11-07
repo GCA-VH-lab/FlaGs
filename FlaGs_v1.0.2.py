@@ -317,7 +317,8 @@ nai=0
 NqueryDict={}
 with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
 	for query in queryDict:
-		if len(queryDict[query])!=0:
+		if queryDict[query]:
+		#if len(queryDict[query])!=0:
 			if args.redundant:
 				NqueryDict[query]=queryDict[query]
 			else:
@@ -539,7 +540,6 @@ if args.tree:
 ###
 #print(seqDict)
 #print(desDict)
-
 
 b=0
 with open (args.out_prefix+'_flankgene.fasta'+'_cluster_out', 'w') as fastaNew:
@@ -886,13 +886,11 @@ if args.tree:###Tree Command###
 	nwTree=''
 	motifDict={}
 	motifDict_2={}
-	treeOrderList=[]
 	with open(args.out_prefix+'_tree/mafft_default-trimal01-none-fasttree_full/'+args.out_prefix+'_tree.fasta.final_tree.nw', 'r') as treeIn:
 		for line in treeIn:
 			nwTree=line
 			for items in line.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
 				item=items.split('_')[0]+'_'+items.split('_')[1]
-				treeOrderList.append(item)
 				simple_motifs=[]
 				simple_motifs_2=[]
 				for keys in sorted(startDict):
@@ -917,6 +915,7 @@ if args.tree:###Tree Command###
 		for item in nwTree.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
 			seqFace = SeqMotifFace(seq, motifs=motifDict[item[:item.index(':')]], seq_format="-", gap_format="blank")
 			(t & item[:item.index(':')]).add_face(seqFace, 0, "aligned")
+		t.ladderize()
 		return t
 
 	def get_example_tree_2():
@@ -926,6 +925,7 @@ if args.tree:###Tree Command###
 		for item in nwTree.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
 			seqFace2 = SeqMotifFace(seq, motifs=motifDict_2[item[:item.index(':')]], seq_format="-", gap_format="blank")
 			(t & item[:item.index(':')]).add_face(seqFace2, 0, "aligned")
+		t.ladderize()
 		return t
 
 	if __name__ == '__main__':
@@ -934,6 +934,7 @@ if args.tree:###Tree Command###
 		ts.tree_width = 300
 		ts.show_branch_support = True
 		if args.tree_order:
+			t.write(outfile=args.out_prefix+'_ladderTree.nw')
 			t.render(args.out_prefix+"_flankgenes_1.svg",tree_style=ts)
 		else:
 			t.show(tree_style=ts)
@@ -945,12 +946,20 @@ if args.tree:###Tree Command###
 		ts.tree_width = 300
 		ts.show_branch_support = True
 		if args.tree_order:
+			t.write(outfile=args.out_prefix+'_ladderTree.nw')
 			t.render(args.out_prefix+"_flankgenes_2.svg", tree_style=ts)
 		else:
 			t.show(tree_style=ts)
 			t.render(args.out_prefix+"_flankgenes_2.svg", tree_style=ts)
 
 if args.tree and args.tree_order:
+	treeOrderList=[]
+	with open(args.out_prefix+'_ladderTree.nw', 'r') as laddertreeIn:
+		for line in laddertreeIn:
+			for items in line.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
+				item=items.split('_')[0]+'_'+items.split('_')[1]
+				treeOrderList.append(item)
+
 	ntPos=[]
 	ptPos=[]
 	with open(args.out_prefix+'_TreeOrder_operon.tsv', 'w') as opOut:
