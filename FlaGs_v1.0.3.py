@@ -526,20 +526,6 @@ if args.tree:
 						querySeqDict[str(record.id)]=str(record.seq)
 					handle.close()
 
-#print(querySeqDict)
-###Going to change
-#seqDict={}
-#desDict={}
-#with open(args.out_prefix+'_flankgene.tsv',"r") as tsvIn :
-#	for line in tsvIn:
-#		if line!='#':
-#			line=line.rstrip().split('\t')
-#			if len(line)==11:
-#				desDict[line[4]]=line[9]
-#				seqDict[line[4]]=line[10]
-###
-#print(seqDict)
-#print(desDict)
 
 b=0
 with open (args.out_prefix+'_flankgene.fasta'+'_cluster_out', 'w') as fastaNew:
@@ -652,9 +638,7 @@ for line in acclists:
 	familyAssignedValue=line.split("\t")[0]
 	if int(line.split("\t")[1])>1:
 		for acc in acclist:
-            #print (acc, "\t", desDict[acc])
 			outfile_des.write(familyAssignedValue+'('+str(allFlankGeneList.count(acc))+')'+"\t"+acc+"\t"+desDict[acc]+"\n")
-        #print ("\n\n")
 		outfile_des.write ("\n\n")
 
 
@@ -774,14 +758,8 @@ if not args.tree:
 			print('\n\n', file=opOut)
 
 	windowMost=round(((max(pPos)+abs(min(nPos))+1)*4)/100)
-	#print(windowMost)
-	#widthM= 5000
-	#heightM= 5000
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*40
-
-	#master = Tk()
-
 	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
 	hbar=Scrollbar(master,orient=HORIZONTAL)
 	hbar.pack(side=BOTTOM,fill=X)
