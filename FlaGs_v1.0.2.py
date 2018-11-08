@@ -317,7 +317,7 @@ nai=0
 NqueryDict={}
 with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
 	for query in queryDict:
-		if len(queryDict[query])!=0:
+		if queryDict[query]:
 			if args.redundant:
 				NqueryDict[query]=queryDict[query]
 			else:
