@@ -120,7 +120,7 @@ def accession_from_xp(accession_nr):
 	:param accession_nr: NCBI protein accession
 	:return: Bioproject number of all species for that protein which is used to grab Assembly number
 	"""
-	Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
+	#Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
 	# blocked, warning is sent to this email.
 	try:
 		handle = Entrez.efetch(db="protein", id=accession_nr, rettype="gbwithparts", retmode="text")
@@ -144,7 +144,7 @@ def accession_from_wp(accession_nr):
 	:return: Set of assembly number of all species for particular protein
 
 	"""
-	Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
+	#Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
 	# blocked, warning is sent to this email.
 	try:
 		handle = Entrez.efetch(db="protein", id=accession_nr, rettype="ipg", retmode="xml")
@@ -175,7 +175,7 @@ def seq_from_wp(accession_nr):
 	:return: Protein Sequence
 	"""
 	if accession_nr[-1]!='*':
-		Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
+		#Entrez.email = "gemma.atkinson@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
 		# blocked, warning is sent to this email.
 		try:
 			handle = Entrez.efetch(db="protein", id=accession_nr, rettype="gbwithparts", retmode="text")
@@ -188,8 +188,11 @@ def seq_from_wp(accession_nr):
 	else:
 		return accession_nr[:-1]+'\t'+'--'
 
-
-
+def des_check(item):
+	if item:
+		return item
+	else:
+		return 'notFound'
 
 
 def normalize_strand(item1, item2):  #Strand change
@@ -370,6 +373,7 @@ for query in NqueryDict:
 			files = ftp.nlst()
 			for elements in files:
 				if 'gff.gz' in elements: #Check if GFF.gz is there
+					#time.sleep(0.1)
 					try:
 						ftp.retrbinary('RETR ' + elements, open(assemblyName[item]+'.gff.gz', 'wb').write)
 						with gzip.open(assemblyName[item]+'.gff.gz', 'rb') as gffIn: #Download and read gff.gz
@@ -413,8 +417,9 @@ for query in NqueryDict:
 												for x in range(1,int(s)):
 													if int(LineList[LineList.index(line)-x][0]) in rangeList:
 														acc_CGF_Dict[query]= LineList[LineList.index(line)-x][-1] +'\t'+ item +'\t'+ ftpLine
-														seqDict[geneProt[LineList[LineList.index(line)-x][1]]]=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]).split('\t')[1])
-														desDict[geneProt[LineList[LineList.index(line)-x][1]]]=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]).split('\t')[0])
+														seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]))
+														seqDict[geneProt[LineList[LineList.index(line)-x][1]]]=seqDes.split('\t')[1]
+														desDict[geneProt[LineList[LineList.index(line)-x][1]]]=seqDes.split('\t')[0]
 														positionDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)-x][2:-2])))
 														LengthDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)-x][3])-int(LineList[LineList.index(line)-x][2])+1
 														udsDict[int(ups(LineList[LineList.index(line)][4])[0]+str(x))]= geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]+\
@@ -422,8 +427,9 @@ for query in NqueryDict:
 												for y in range(1,int(s)):
 													if int(LineList[LineList.index(line)+y][0]) in rangeList:
 														acc_CGF_Dict[query]= LineList[LineList.index(line)+y][-1] +'\t'+ item +'\t'+ ftpLine
-														seqDict[geneProt[LineList[LineList.index(line)+y][1]]]=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]).split('\t')[1])
-														desDict[geneProt[LineList[LineList.index(line)+y][1]]]=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]).split('\t')[0])
+														seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]))
+														seqDict[geneProt[LineList[LineList.index(line)+y][1]]]=seqDes.split('\t')[1]
+														desDict[geneProt[LineList[LineList.index(line)+y][1]]]=seqDes.split('\t')[0]
 														positionDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)+y][2:-2])))
 														LengthDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)+y][3])-int(LineList[LineList.index(line)+y][2])+1
 														dsDict[int(downs(LineList[LineList.index(line)][4])[0]+str(y))]= geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]+\
@@ -439,6 +445,10 @@ for query in NqueryDict:
 														FlankFoundDict[query]='No'
 														if args.verbose:
 															print('\t', query.split('#')[0], 'Report: Flanking Genes Not Found', '\n')
+												else:
+													FlankFoundDict[query]='No'
+													if args.verbose:
+														print('\t', query.split('#')[0], 'Report: Flanking Genes Not Found', '\n')
 							gff_gz='./'+assemblyName[item]+'.gff.gz'
 							if args.keep:
 								pass
@@ -448,16 +458,38 @@ for query in NqueryDict:
 								else:    ## Show an error ##
 									print("Error: %s file not found" % gff_gz)
 					except:
-						FoundDict[query]='No: Network_Error'
+						FlankFoundDict[query]='No'
+						FoundDict[query]='No: ProteinID was not found in Genome Assembly'
+						pass
+						if args.verbose:
+							print('\t', query.split('#')[0], 'Report: Flanking Genes Not Found', '\n')
+
 						#print(query.split('#')[0], item, ftp_path, sep='\t', file=error)
 		else:
-			FoundDict[query]='Yes : ProteinID did not match '
+			FoundDict[query]='Yes : Assembly ID did not match with RefSeq '
+			pass
 			if args.verbose:
 				print('\t', 'Corresponding Assembly ID', item, 'does not exist in NCBI Refseq', '\n')
 
 #accFlankDict
 
-#print(acc_CGF_Dict)
+#print(accFlankDict)
+#print('queryDict=',queryDict)
+#print('NqueryDict=',NqueryDict)
+#print('assemblyName=', assemblyName['GCA_000018105.1'])
+#print('FoundDict=',FoundDict)#Accession that found in Refseq
+#print('FlankFoundDict=',FlankFoundDict)#Accession that have flanking genes
+#print('accFlankDict=',accFlankDict) #{'WP_092250023.1#1': {0: 'WP_092250023.1+', 1: 'WP_092250020.1+', 2: 'WP_092250017.1-', -1: 'tRNA*+', -2: 'WP_092250026.1-'}}
+#print('positionDict=',positionDict)#Accession as keys:Start and end position as value
+#print('speciesDict=',speciesDict)#SpeciesName stored here
+#print('queryStrand=',queryStrand)#Strand Information for each query
+#print('LengthDict=',LengthDict) #Length of each query
+
+#print('seqDict=',seqDict)
+#print('desDict=',desDict)
+#print('acc_CGF_Dict=',acc_CGF_Dict)
+
+
 '''
 {'WP_000004567.1#1': {0: 'WP_000004567.1#1+', -1: 'WP_000931496.1#1+', -2: 'WP_003310314.1#1+', -3: 'WP_033795253.1#1-', -4: 'WP_000153877.1#1+', 1: 'WP_000342211.1#1-', 2: 'WP_000708631.1#1-', 3: 'WP_000291520.1#1-', 4: 'WP_000572582.1#1-'}}
 '''
@@ -525,6 +557,33 @@ if args.tree:
 						print(record.format("fasta"), file=treeOut)
 						querySeqDict[str(record.id)]=str(record.seq)
 					handle.close()
+
+#print(querySeqDict)
+###Going to change
+#seqDict={}
+#desDict={}
+#with open(args.out_prefix+'_flankgene.tsv',"r") as tsvIn :
+#	for line in tsvIn:
+#		if line!='#':
+#			line=line.rstrip().split('\t')
+#			if len(line)==11:
+#				desDict[line[4]]=line[9]
+#				seqDict[line[4]]=line[10]
+###
+#print(seqDict)
+#print(desDict)
+if len(seqDict)!=len(desDict):
+	if len(seqDict)>len(desDict):
+		for seqids in sorted(seqDict):
+			if seqids not in desDict:
+				desDict[seqids]=des_check(str(seq_from_wp(seqids).split('\t')[0]))
+	else:
+		for seqids in sorted(desDict):
+			if seqids not in seqDict:
+				seqDict[seqids]=str(seq_from_wp(seqids).split('\t')[1])
+else:
+	if args.verbose:
+		print ('Description collected for Flanking Genes!')
 
 
 b=0
@@ -638,7 +697,9 @@ for line in acclists:
 	familyAssignedValue=line.split("\t")[0]
 	if int(line.split("\t")[1])>1:
 		for acc in acclist:
+            #print (acc, "\t", desDict[acc])
 			outfile_des.write(familyAssignedValue+'('+str(allFlankGeneList.count(acc))+')'+"\t"+acc+"\t"+desDict[acc]+"\n")
+        #print ("\n\n")
 		outfile_des.write ("\n\n")
 
 
@@ -758,8 +819,14 @@ if not args.tree:
 			print('\n\n', file=opOut)
 
 	windowMost=round(((max(pPos)+abs(min(nPos))+1)*4)/100)
+	#print(windowMost)
+	#widthM= 5000
+	#heightM= 5000
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*40
+
+	#master = Tk()
+
 	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
 	hbar=Scrollbar(master,orient=HORIZONTAL)
 	hbar.pack(side=BOTTOM,fill=X)
@@ -794,7 +861,7 @@ if not args.tree:
 			ptnstats=entries[0].split("\t")
 			org=ptnstats[0].replace ("_"," ")
 			textspace=widthM/2
-			line_pos_y=line_pos_y+ 25
+			line_pos_y=line_pos_y+((heightM/newQ)-15)
 			half_dom_height=8
 			ptn_len=ptnstats[5]
 			text = canvas.create_text(textspace/2,line_pos_y, text=org, fill="#404040", font=("Arial", "12"))
@@ -803,9 +870,8 @@ if not args.tree:
 				items=entry.split("\t")
 				aln_start=round(int(items[5])*4/100)
 				aln_end=round(int(items[6])*4/100)
-				hmm_name=int(items[4])
 				strandType=items[3]
-				dom1_name=hmm_name
+				dom1_name=int(items[4])
 				dom1_len=(aln_end-aln_start)
 				oL80=round(dom1_len*80/100)
 				dom1_start=aln_start+textspace
@@ -864,11 +930,13 @@ if args.tree:###Tree Command###
 	nwTree=''
 	motifDict={}
 	motifDict_2={}
+	#treeOrderList=[]
 	with open(args.out_prefix+'_tree/mafft_default-trimal01-none-fasttree_full/'+args.out_prefix+'_tree.fasta.final_tree.nw', 'r') as treeIn:
 		for line in treeIn:
 			nwTree=line
 			for items in line.replace('(','').replace(')', '').replace(';', '').replace(',','\t').split('\t'):
 				item=items.split('_')[0]+'_'+items.split('_')[1]
+				#treeOrderList.append(item)
 				simple_motifs=[]
 				simple_motifs_2=[]
 				for keys in sorted(startDict):
@@ -988,15 +1056,18 @@ if args.tree and args.tree_order:
 			print('\n\n', file=opOut)
 
 	windowMost=round(((max(ptPos)+abs(min(ntPos))+1)*4)/100)
-	#print(windowMost)
+	#print('ptPos', ptPos, max(ptPos))
+	#print('ntPos', ntPos, min(ntPos))
+	#print('windowMost', windowMost)
 	#widthM= 5000
 	#heightM= 5000
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*40
+	#print(widthM, heightM)
 	#master = Tk()
 
 
-	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5) )
+	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5))
 	hbar=Scrollbar(master,orient=HORIZONTAL)
 	hbar.pack(side=BOTTOM,fill=X)
 	hbar.config(command=canvas.xview)
@@ -1030,7 +1101,7 @@ if args.tree and args.tree_order:
 			ptnstats=entries[0].split("\t")
 			org=ptnstats[0].replace ("_"," ")
 			textspace=widthM/2
-			line_pos_y=line_pos_y+ 25
+			line_pos_y=line_pos_y+((heightM/newQ)-15)
 			half_dom_height=8
 			ptn_len=ptnstats[5]
 			text = canvas.create_text(textspace/2,line_pos_y, text=org, fill="#404040", font=("Arial", "12"))
@@ -1039,9 +1110,8 @@ if args.tree and args.tree_order:
 				items=entry.split("\t")
 				aln_start=round(int(items[5])*4/100)
 				aln_end=round(int(items[6])*4/100)
-				hmm_name=int(items[4])
 				strandType=items[3]
-				dom1_name=hmm_name
+				dom1_name=int(items[4])
 				dom1_len=(aln_end-aln_start)
 				oL80=round(dom1_len*80/100)
 				dom1_start=aln_start+textspace
