@@ -351,7 +351,7 @@ desDict={}
 
 acc_CGF_Dict={}
 
-#with open(args.out_prefix+'_flankgene.tsv', 'w') as ftab:
+
 count=0
 for query in NqueryDict:
 	count+=1
@@ -471,33 +471,13 @@ for query in NqueryDict:
 			if args.verbose:
 				print('\t', 'Corresponding Assembly ID', item, 'does not exist in NCBI Refseq', '\n')
 
-#accFlankDict
-'''
-with open (args.out_prefix+'.log', 'w') as logout:
-#print(accFlankDict)
-	print('queryDict=',queryDict, file=logout)
-	print('NqueryDict=',NqueryDict, file=logout)
-	print('assemblyName=', assemblyName, file=logout)
-	print('FoundDict=',FoundDict, file=logout)#Accession that found in Refseq
-	print('FlankFoundDict=',FlankFoundDict, file=logout)#Accession that have flanking genes
-	print('accFlankDict=',accFlankDict, file=logout) #{'WP_092250023.1#1': {0: 'WP_092250023.1+', 1: 'WP_092250020.1+', 2: 'WP_092250017.1-', -1: 'tRNA*+', -2: 'WP_092250026.1-'}}
-	print('positionDict=',positionDict, file=logout)#Accession as keys:Start and end position as value
-	print('speciesDict=',speciesDict, file=logout)#SpeciesName stored here
-	print('queryStrand=',queryStrand, file=logout)#Strand Information for each query
-	print('LengthDict=',LengthDict, file=logout) #Length of each query
-	print('seqDict=',seqDict, file=logout)
-	print('desDict=',desDict, file=logout)
-	print('acc_CGF_Dict=',acc_CGF_Dict, file=logout)
-'''
 
-'''
-{'WP_000004567.1#1': {0: 'WP_000004567.1#1+', -1: 'WP_000931496.1#1+', -2: 'WP_003310314.1#1+', -3: 'WP_033795253.1#1-', -4: 'WP_000153877.1#1+', 1: 'WP_000342211.1#1-', 2: 'WP_000708631.1#1-', 3: 'WP_000291520.1#1-', 4: 'WP_000572582.1#1-'}}
-'''
+
 allFlankGeneList=[]
 for keys in accFlankDict:
 	for item in accFlankDict[keys]:
 		allFlankGeneList.append(accFlankDict[keys][item].split('#')[0])
-#print(allFlankGeneList)
+
 
 myfile="./input.txt" # for deletion of the downloaded file from ftp
 if args.keep:
@@ -558,20 +538,7 @@ if args.tree:
 						querySeqDict[str(record.id)]=str(record.seq)
 					handle.close()
 
-#print(querySeqDict)
-###Going to change
-#seqDict={}
-#desDict={}
-#with open(args.out_prefix+'_flankgene.tsv',"r") as tsvIn :
-#	for line in tsvIn:
-#		if line!='#':
-#			line=line.rstrip().split('\t')
-#			if len(line)==11:
-#				desDict[line[4]]=line[9]
-#				seqDict[line[4]]=line[10]
-###
-#print(seqDict)
-#print(desDict)
+
 if len(seqDict)!=len(desDict):
 	if len(seqDict)>len(desDict):
 		for seqids in sorted(seqDict):
@@ -685,7 +652,7 @@ with open(infilename+"_"+iters+"_"+evthresh+"_clusters.tsv","w") as clusOut:
 		if len(k.split(';'))>0 and v>0:
 			familyNumber+=1
 			print(str(familyNumber),str(odtrue[k]),k, sep='\t', file=clusOut)
-#			k=k+1
+
 
 
 outfile_des=open(infilename+"_"+iters+"_"+evthresh+"_outdesc.txt","w")
