@@ -25,14 +25,14 @@ parser.add_argument("-p", "--proteinList", help="Protein Accession eg. XP_ or WP
 parser.add_argument("-r", "--redundant",action="store_true", help="Search all GCFs for each query")
 parser.add_argument("-e", "--ethreshold", help="E value threshold. Default = 1e-10")
 parser.add_argument("-n", "--number", help="Number of Jackhmmer iterations. Default = 3")
-parser.add_argument("-s", "--strand", help="Number of strand for looking up or downstream. Default = 4")
+parser.add_argument("-g", "--gene", help="Number of genes for looking up or downstream. Default = 4")
 parser.add_argument("-t", "--tree", action="store_true", help="If you want to see flanking genes along with phylogenetic tree, requires ETE3 installation. By default it will not produce.")
 parser.add_argument("-ts", "--tshape", help="Size of triangle shapes that represent flanking genes, this option only works when -t is used. Default = 12 ")
 parser.add_argument("-tf", "--tfontsize", help="Size of font inside triangles that represent flanking genes, this option only works when -t is used. Default = 4 ")
 parser.add_argument("-to", "--tree_order", action="store_true", help="Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-o", "--out_prefix", required= True, help="Any Keyword to define your output eg. MyQuery")
 parser.add_argument("-k", "--keep", action="store_true", help="If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove.")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.3')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.4')
 parser.add_argument("-vb", "--verbose", action="store_true", help="Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
@@ -78,9 +78,9 @@ if args.number:
 else:
 	iters="3"
 
-if args.strand:
-	if int(args.strand)>0:
-		s= str(int(args.strand)+1)
+if args.gene:
+	if int(args.gene)>0:
+		s= str(int(args.gene)+1)
 	else:
 		print('Please insert positive values, starting from 1')
 		sys.exit()
@@ -195,7 +195,7 @@ def des_check(item):
 		return 'notFound'
 
 
-def normalize_strand(item1, item2):  #Strand change
+def normalize_strand(item1, item2):  #Strand direction change
 	if item1=='+':
 		return item2
 	else:
