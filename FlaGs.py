@@ -1034,7 +1034,7 @@ if not args.tree:
 
 			print('\n\n', file=opOut)
 
-	windowMost=round(((max(ptPos)+abs(min(ntPos))+1)*4)/100)
+	windowMost=round(((max(pPos)+abs(min(nPos))+1)*4)/100)
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*20
 	#aheightM=heightM*1.3
