@@ -14,7 +14,7 @@ from collections import OrderedDict
 from tkinter import *
 master = Tk()
 import subprocess
-Entrez.email = "gemma.atkinson@gmail.com"
+Entrez.email = "chayan.sust7@gmail.com"
 
 usage= ''' Description:  Identify flanking genes and cluster them based on similarity and visualize the structure; Requirement= Python3, BioPython; tkinter ; Optional Requirement= ETE3. '''
 
@@ -34,7 +34,7 @@ parser.add_argument("-tf", "--tfontsize", help=" Size of font inside triangles t
 parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.5')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.6')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
@@ -68,6 +68,11 @@ if args.tree:
 else:
 	if args.tfontsize:
 		print("Kindly make sure that you are using -t to make this -tf argument working")
+		sys.exit()
+
+if args.tree_order:
+	if not args.tree:
+		print("Kindly make sure that you are using -t to make this -to argument working")
 		sys.exit()
 
 if args.ethreshold:
@@ -273,17 +278,29 @@ def lcheck(item):
 
 
 if not args.localGenomeList:
-	ftp = ftplib.FTP('ftp.ncbi.nih.gov', 'anonymous', 'anonymous@ftp.ncbi.nih.gov')
-	ftp.cwd("/genomes/refseq") # move to refseq directory
+	if os.path.isfile('refSeq.db'):
+		if os.path.isfile('genBank.db'):
+			pass
+	else:
+		ftp = ftplib.FTP('ftp.ncbi.nih.gov', 'anonymous', 'anonymous@ftp.ncbi.nih.gov')
+		ftp.cwd("/genomes/refseq") # move to refseq directory
 
-	filenames = ftp.nlst() # get file/directory names within the directory
-	if 'assembly_summary_refseq.txt' in filenames:
-		ftp.retrbinary('RETR ' + 'assembly_summary_refseq.txt', open('input.txt', 'wb').write) # get the assembly summary from refseq
+		filenames = ftp.nlst() # get file/directory names within the directory
+		if 'assembly_summary_refseq.txt' in filenames:
+			ftp.retrbinary('RETR ' + 'assembly_summary_refseq.txt', open('refSeq.db', 'wb').write) # get the assembly summary from refseq
+
+		ftp_gen = ftplib.FTP('ftp.ncbi.nih.gov', 'anonymous', 'anonymous@ftp.ncbi.nih.gov')
+		ftp_gen.cwd("/genomes/genbank") # move to refseq directory
+
+		filenames = ftp_gen.nlst() # get file/directory names within the directory
+		if 'assembly_summary_genbank.txt' in filenames:
+			ftp_gen.retrbinary('RETR ' + 'assembly_summary_genbank.txt', open('genBank.db', 'wb').write) # get the assembly summary from refseq
+
 
 	assemblyName={}
 	bioDict={} #bioproject as keys and assemble number (eg.GCF_000001765.1) as value
 	accnr_list_dict={} #create a dictionary accessionNumber is a key and Organism name and ftp Gff3 download Link as value
-	with open('input.txt', 'r') as fileIn:
+	with open('refSeq.db', 'r') as fileIn:
 		for line in fileIn:
 			if line[0]!='#':
 				Line=line.rstrip().split('\t')
@@ -294,15 +311,11 @@ if not args.localGenomeList:
 	ftp_gen = ftplib.FTP('ftp.ncbi.nih.gov', 'anonymous', 'anonymous@ftp.ncbi.nih.gov')
 	ftp_gen.cwd("/genomes/genbank") # move to refseq directory
 
-	filenames = ftp_gen.nlst() # get file/directory names within the directory
-	if 'assembly_summary_genbank.txt' in filenames:
-		ftp_gen.retrbinary('RETR ' + 'assembly_summary_genbank.txt', open('input_genbank.txt', 'wb').write) # get the assembly summary from refseq
-
 
 	assemblyName_GCA={}
 	bioDict_gen={}
 	accnr_list_dict_gen={} #create a dictionary accessionNumber is a key and Organism name and ftp Gff3 download Link as value
-	with open('input_genbank.txt', 'r') as fileIn:
+	with open('genBank.db', 'r') as fileIn:
 		for line in fileIn:
 			if line[0]!='#':
 				Line=line.rstrip().split('\t')
@@ -355,8 +368,11 @@ if not args.localGenomeList:
 				elif query[0][:2]=='XP':
 					asset=set()
 					for bioprojs in accession_from_xp(query[0]):
-						if bioDict[bioprojs]==query[1]:
-							asset.add(query[1])
+						if bioprojs in bioDict:
+							if bioDict[bioprojs]==query[1]:
+								asset.add(query[1])
+							else:
+								pass
 					queryDict[query[0]+'#'+str(q)]=asset
 				else:
 					ne+=1
@@ -427,10 +443,10 @@ if args.localGenomeList:
 											break
 								else:    ## Show an error ##
 									print("Error: %s file not found" % gff_gz)
-									sys.exit()
+									#sys.exit()
 			else:
 				print("Error: %s file not found" % faa_gz)
-				sys.exit()
+				#sys.exit()
 
 else:
 	with open (args.out_prefix+'_Insufficient_Info_In_DB.txt', 'w') as fNai:
@@ -721,7 +737,7 @@ for keys in accFlankDict:
 		allFlankGeneList.append(accFlankDict[keys][item].split('#')[0])
 
 if not args.localGenomeList:
-	myfile="./input.txt" # for deletion of the downloaded file from ftp
+	myfile="./refSeq.db" # for deletion of the downloaded file from ftp
 	if args.keep:
 		pass
 	else:
@@ -730,7 +746,7 @@ if not args.localGenomeList:
 		else:    ## Show an error ##
 			print("Error: %s file not found" % myfile)
 
-	myfile="./input_genbank.txt" # for deletion of the downloaded file from ftp
+	myfile="./genBank.db" # for deletion of the downloaded file from ftp
 	if args.keep:
 		pass
 	else:
@@ -952,14 +968,18 @@ for acc in familyDict:
 
 center=int(max(familynum))+1
 noProt=int(max(familynum))+2
-
+noColor=int(max(familynum))+3
 for ids in LengthDict:
 	if ids.split('#')[0][-1]=='*':
 		familyDict[ids.split('#')[0]]=noProt
 	if ids.split('#')[0] not in familyDict:
-		familyDict[ids.split('#')[0]]=center
-
+		if ids in NqueryDict:
+			#print(ids.split('#')[0])
+			familyDict[ids.split('#')[0]]=center
+		else:
+			familyDict[ids.split('#')[0]]=noColor
 color={}
+color[noColor]='#ffffff'
 color[center]='#000000'
 color[noProt]='#f2f2f2'
 
@@ -985,6 +1005,11 @@ colorDict.update(color)
 maxs=(int(s)-1)
 mins=maxs-(maxs*2)
 
+#print(LengthDict)
+
+#print(familyDict)
+
+#print(colorDict)
 
 if not args.tree:
 	nPos=[]
@@ -1057,6 +1082,8 @@ if not args.tree:
 			return ' '
 		elif item==noProt:
 			return ' '
+		elif item==noColor:
+			return ' '
 		else:
 			return item
 
@@ -1116,6 +1143,8 @@ if args.tree:###Tree Command###
 		elif item==center:
 			return ' '
 		elif item==noProt:
+			return ' '
+		elif item==noColor:
 			return ' '
 		else:
 			return str(item)
@@ -1287,6 +1316,8 @@ if args.tree and args.tree_order:
 		elif item==center:
 			return ' '
 		elif item==noProt:
+			return ' '
+		elif item==noColor:
 			return ' '
 		else:
 			return item
