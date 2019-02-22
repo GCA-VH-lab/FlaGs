@@ -589,25 +589,27 @@ for query in NqueryDict:
 													dsDict={}
 													udsDict[0]= query+'+' # O strand
 													for x in range(1,int(s)):
-														if int(LineList[LineList.index(line)-x][0]) in rangeList:
-															acc_CGF_Dict[query]= LineList[LineList.index(line)-x][-1] +'\t'+ item +'\t'+ ftpLine
-															seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]))
-															seqDict[geneProt[LineList[LineList.index(line)-x][1]]]=seqDes.split('\t')[1]
-															desDict[geneProt[LineList[LineList.index(line)-x][1]]]=seqDes.split('\t')[0]
-															positionDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)-x][2:-2])))
-															LengthDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)-x][3])-int(LineList[LineList.index(line)-x][2])+1
-															udsDict[int(ups(LineList[LineList.index(line)][4])[0]+str(x))]= geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]+\
-																normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)-x][4])
+														if LineList.index(line)-x<len(LineList):
+															if int(LineList[LineList.index(line)-x][0]) in rangeList:
+																acc_CGF_Dict[query]= LineList[LineList.index(line)-x][-1] +'\t'+ item +'\t'+ ftpLine
+																seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]))
+																seqDict[geneProt[LineList[LineList.index(line)-x][1]]]=seqDes.split('\t')[1]
+																desDict[geneProt[LineList[LineList.index(line)-x][1]]]=seqDes.split('\t')[0]
+																positionDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)-x][2:-2])))
+																LengthDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)-x][3])-int(LineList[LineList.index(line)-x][2])+1
+																udsDict[int(ups(LineList[LineList.index(line)][4])[0]+str(x))]= geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]+\
+																	normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)-x][4])
 													for y in range(1,int(s)):
-														if int(LineList[LineList.index(line)+y][0]) in rangeList:
-															acc_CGF_Dict[query]= LineList[LineList.index(line)+y][-1] +'\t'+ item +'\t'+ ftpLine
-															seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]))
-															seqDict[geneProt[LineList[LineList.index(line)+y][1]]]=seqDes.split('\t')[1]
-															desDict[geneProt[LineList[LineList.index(line)+y][1]]]=seqDes.split('\t')[0]
-															positionDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)+y][2:-2])))
-															LengthDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)+y][3])-int(LineList[LineList.index(line)+y][2])+1
-															dsDict[int(downs(LineList[LineList.index(line)][4])[0]+str(y))]= geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]+\
-																normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)+y][4])
+														if LineList.index(line)+y<len(LineList):
+															if int(LineList[LineList.index(line)+y][0]) in rangeList:
+																acc_CGF_Dict[query]= LineList[LineList.index(line)+y][-1] +'\t'+ item +'\t'+ ftpLine
+																seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]))
+																seqDict[geneProt[LineList[LineList.index(line)+y][1]]]=seqDes.split('\t')[1]
+																desDict[geneProt[LineList[LineList.index(line)+y][1]]]=seqDes.split('\t')[0]
+																positionDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)+y][2:-2])))
+																LengthDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)+y][3])-int(LineList[LineList.index(line)+y][2])+1
+																dsDict[int(downs(LineList[LineList.index(line)][4])[0]+str(y))]= geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]+\
+																	normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)+y][4])
 													udsDict.update(dsDict)
 													accFlankDict[query]=udsDict
 													if query in accFlankDict:
@@ -695,25 +697,27 @@ for query in NqueryDict:
 										dsDict={}
 										udsDict[0]= query+'+' # O strand
 										for x in range(1,int(s)):
-											if int(LineList[LineList.index(line)-x][0]) in rangeList:
-												acc_CGF_Dict[query]= LineList[LineList.index(line)-x][-1] +'\t'+ item
-												#seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]))
-												seqDict[str(geneProt[LineList[LineList.index(line)-x][1]])]=localNone(seqLocal(item, geneProt[LineList[LineList.index(line)-x][1]]))
-												desDict[geneProt[LineList[LineList.index(line)-x][1]]]=desLocal(item, geneProt[LineList[LineList.index(line)-x][1]])
-												positionDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)-x][2:-2])))
-												LengthDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)-x][3])-int(LineList[LineList.index(line)-x][2])+1
-												udsDict[int(ups(LineList[LineList.index(line)][4])[0]+str(x))]= geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]+\
-													normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)-x][4])
+											if LineList.index(line)-x<len(LineList):
+												if rangeList.count(int(LineList[LineList.index(line)-x][0]))>0:
+													acc_CGF_Dict[query]= LineList[LineList.index(line)-x][-1] +'\t'+ item
+													#seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)-x][1]]))
+													seqDict[str(geneProt[LineList[LineList.index(line)-x][1]])]=localNone(seqLocal(item, geneProt[LineList[LineList.index(line)-x][1]]))
+													desDict[geneProt[LineList[LineList.index(line)-x][1]]]=desLocal(item, geneProt[LineList[LineList.index(line)-x][1]])
+													positionDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)-x][2:-2])))
+													LengthDict[geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)-x][3])-int(LineList[LineList.index(line)-x][2])+1
+													udsDict[int(ups(LineList[LineList.index(line)][4])[0]+str(x))]= geneProt[LineList[LineList.index(line)-x][1]]+'#'+query.split('#')[1]+\
+														normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)-x][4])
 										for y in range(1,int(s)):
-											if int(LineList[LineList.index(line)+y][0]) in rangeList:
-												acc_CGF_Dict[query]= LineList[LineList.index(line)+y][-1] +'\t'+ item
-												#seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]))
-												seqDict[str(geneProt[LineList[LineList.index(line)+y][1]])]=localNone(seqLocal(item,geneProt[LineList[LineList.index(line)+y][1]]))
-												desDict[geneProt[LineList[LineList.index(line)+y][1]]]=desLocal(item,geneProt[LineList[LineList.index(line)+y][1]])
-												positionDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)+y][2:-2])))
-												LengthDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)+y][3])-int(LineList[LineList.index(line)+y][2])+1
-												dsDict[int(downs(LineList[LineList.index(line)][4])[0]+str(y))]= geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]+\
-													normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)+y][4])
+											if LineList.index(line)+y<len(LineList):
+												if rangeList.count(int(LineList[LineList.index(line)+y][0]))>0:
+													acc_CGF_Dict[query]= LineList[LineList.index(line)+y][-1] +'\t'+ item
+													#seqDes=str(seq_from_wp(geneProt[LineList[LineList.index(line)+y][1]]))
+													seqDict[str(geneProt[LineList[LineList.index(line)+y][1]])]=localNone(seqLocal(item,geneProt[LineList[LineList.index(line)+y][1]]))
+													desDict[geneProt[LineList[LineList.index(line)+y][1]]]=desLocal(item,geneProt[LineList[LineList.index(line)+y][1]])
+													positionDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= ("\t".join(map(str,LineList[LineList.index(line)+y][2:-2])))
+													LengthDict[geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]]= int(LineList[LineList.index(line)+y][3])-int(LineList[LineList.index(line)+y][2])+1
+													dsDict[int(downs(LineList[LineList.index(line)][4])[0]+str(y))]= geneProt[LineList[LineList.index(line)+y][1]]+'#'+query.split('#')[1]+\
+														normalize_strand(LineList[LineList.index(line)][4],LineList[LineList.index(line)+y][4])
 										udsDict.update(dsDict)
 										accFlankDict[query]=udsDict
 										if query in accFlankDict:
