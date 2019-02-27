@@ -1130,7 +1130,7 @@ if not args.tree:
 
 if args.tree:###Tree Command###
 	tree_file= args.out_prefix+'_tree.fasta'
-	tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full" %(tree_file, tree_file[:-6])
+	tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full" %(tree_file, tree_file[:-6])
 	#print(tree_command)
 	os.system(tree_command)
 	from ete3 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
