@@ -5,8 +5,12 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein, IUPAC
 import random
+import math
 import argparse
 import ftplib
+import random
+from random import randint
+import colorsys
 import os, sys, os.path, math
 import gzip
 import getopt
@@ -33,11 +37,41 @@ parser.add_argument("-ts", "--tshape", help=" Size of triangle shapes that repre
 parser.add_argument("-tf", "--tfontsize", help=" Size of font inside triangles that represent flanking genes, this option only works when -t is used. Default = 4 ")
 parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
+parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.6')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.7')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
+
+
+def random_color(h=None):
+	"""Generates a random color in RGB format."""
+	if not h:
+		c = random.random()
+	d = 0.5
+	e = 0.5
+	return _hls2hex(c, d, e)
+
+def _hls2hex(c, d, e):
+	return '#%02x%02x%02x' %tuple(map(lambda f: int(f*255),colorsys.hls_to_rgb(c, d, e)))
+
+def outliner (item):
+	if item =='#ffffff':
+		return '#bebebe'
+	elif item =='#f2f2f2':
+		return '#008000'
+	elif item =='#f2f2f3':
+		return '#000080'
+	else:
+		return item
+
+if args.cpu:
+	if int(args.cpu)>0:
+		core=int(args.cpu)
+	else:
+		print('Please use number eg, 1,2...')
+		sys.exit()
 
 if args.assemblyList:
 	if args.redundant:
@@ -276,6 +310,49 @@ def lcheck(item):
 	else:
 		return 0
 
+def postscriptSize(item):
+	if int(item)<1000:
+		return(0)
+	else:
+		return(int(item)/1000)
+
+def spLocal(faa,acc):
+	faaFile=faa+'.faa.gz'
+	fastaSeq = gzip.open(localDir+faaFile, "rt")
+	for record in SeqIO.parse(fastaSeq, "fasta"):
+		if record.id==acc:
+			return record.description.split('[')[-1][:-1]
+
+def desLocal(faa,acc):
+	faaFile=faa+'.faa.gz'
+	fastaSeq = gzip.open(localDir+faaFile, "rt")
+	for record in SeqIO.parse(fastaSeq, "fasta"):
+		if record.id==acc:
+			return record.description.split('[')[0]
+
+def seqLocal(faa,acc):
+	faaFile=faa+'.faa.gz'
+	fastaSeq = gzip.open(localDir+faaFile, "rt")
+	for record in SeqIO.parse(fastaSeq, "fasta"):
+		if record.id==acc:
+			return str(record.seq)
+
+def localNone(item):
+	if item==None:
+		return '--'
+	else:
+		return item
+
+def seqFasLocal(faa,acc):
+	faaFile=faa+'.faa.gz'
+	fastaSeq = gzip.open(localDir+faaFile, "rt")
+	for record in SeqIO.parse(fastaSeq, "fasta"):
+		if record.id==acc.split('#')[0]:
+			record.id=acc+'_'+record.description.split('[')[-1][:-1].replace(' ','_').replace(':','_').replace('[','_').replace(']','_')
+			return record.format("fasta")
+
+#print(seqFasLocal('GCF_000332195.1','WP_019504790.1'))
+
 
 if not args.localGenomeList:
 	if os.path.isfile('refSeq.db'):
@@ -474,42 +551,6 @@ print('\t'+'Discarded protein ids lacking proper information in RefSeq DB : '+st
 print('\t'+'Remaining queries: '+str(newQ))
 
 
-def spLocal(faa,acc):
-	faaFile=faa+'.faa.gz'
-	fastaSeq = gzip.open(localDir+faaFile, "rt")
-	for record in SeqIO.parse(fastaSeq, "fasta"):
-		if record.id==acc:
-			return record.description.split('[')[-1][:-1]
-
-def desLocal(faa,acc):
-	faaFile=faa+'.faa.gz'
-	fastaSeq = gzip.open(localDir+faaFile, "rt")
-	for record in SeqIO.parse(fastaSeq, "fasta"):
-		if record.id==acc:
-			return record.description.split('[')[0]
-
-def seqLocal(faa,acc):
-	faaFile=faa+'.faa.gz'
-	fastaSeq = gzip.open(localDir+faaFile, "rt")
-	for record in SeqIO.parse(fastaSeq, "fasta"):
-		if record.id==acc:
-			return str(record.seq)
-
-def localNone(item):
-	if item==None:
-		return '--'
-	else:
-		return item
-
-def seqFasLocal(faa,acc):
-	faaFile=faa+'.faa.gz'
-	fastaSeq = gzip.open(localDir+faaFile, "rt")
-	for record in SeqIO.parse(fastaSeq, "fasta"):
-		if record.id==acc.split('#')[0]:
-			record.id=acc+'_'+record.description.split('[')[-1][:-1].replace(' ','_').replace(':','_').replace('[','_').replace(']','_')
-			return record.format("fasta")
-
-#print(seqFasLocal('GCF_000332195.1','WP_019504790.1'))
 
 FoundDict={} #Accession that found in Refseq
 FlankFoundDict={} #Accession that have flanking genes
@@ -558,7 +599,7 @@ for query in NqueryDict:
 											if Line[8].split(';')[3][:5]=='Name=': #eliminates pseudo gene as they don't have 'Name='
 												geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
 												geneChrom[Line[8].split(';')[1].split('=')[1]]=Line[0]
-										if Line[2]=='gene':
+										if Line[2][-4:]=='gene':
 											a+=1
 											newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
 											LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
@@ -666,7 +707,7 @@ for query in NqueryDict:
 								if Line[8].split(';')[3][:5]=='Name=': #eliminates pseudo gene as they don't have 'Name='
 									geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
 									geneChrom[Line[8].split(';')[1].split('=')[1]]=Line[0]
-							if Line[2]=='gene':
+							if Line[2][-4:]=='gene':
 								a+=1
 								newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
 								LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
@@ -774,7 +815,8 @@ with open (args.out_prefix+'_flankgene_Report.log', 'w') as errOut:
 		serial+=1
 		if queries in FoundDict:
 			if queries in FlankFoundDict:
-				flankF+=1
+				if FlankFoundDict[queries]=='Yes':
+					flankF+=1
 				print(str(serial), queries.split('#')[0], FoundDict[queries], FlankFoundDict[queries], sep='\t', file=errOut)
 			else:
 				print(str(serial), queries.split('#')[0], FoundDict[queries], 'No', sep='\t', file=errOut)
@@ -783,7 +825,7 @@ with open (args.out_prefix+'_flankgene_Report.log', 'w') as errOut:
 
 print('\n')
 
-print('>> '+str(flankF)+' accessions ran successfully out of remaining '+str(serial)+'. See "'+args.out_prefix+'_flankgene_Report.log'+'" file for details.'+'\n'+'\n')
+print('>> Flanking Genes found : '+str(flankF)+' out of remaining '+str(serial)+'. See "'+args.out_prefix+'_flankgene_Report.log'+'" file for details.'+'\n'+'\n')
 
 #print(accFlankDict)
 
@@ -852,7 +894,10 @@ for seqids in sorted(seqDict):
 		indivfile=open(i_f,"w")
 		indivfile.write(">"+seqids+'\n'+seqDict[seqids])
 		indivfile.close()
-		command="jackhmmer -N %s --incE %s --incdomE %s --tblout %s/tblout%s.txt %s  %s>%s/out%s.txt" %(iters, evthresh, evthresh, directory, str(i), i_f, infilename, directory, str(i))
+		if args.cpu:
+			command="jackhmmer --cpu %s -N %s --incE %s --incdomE %s --tblout %s/tblout%s.txt %s  %s>%s/out%s.txt" %(core, iters, evthresh, evthresh, directory, str(i), i_f, infilename, directory, str(i))
+		else:
+			command="jackhmmer -N %s --incE %s --incdomE %s --tblout %s/tblout%s.txt %s  %s>%s/out%s.txt" %(iters, evthresh, evthresh, directory, str(i), i_f, infilename, directory, str(i))
 		#print(command)
 		os.system(command)
 		tbl=open(directory+"/tblout"+str(i)+".txt").read()
@@ -884,19 +929,19 @@ for line in raw.split("\n"):
 
 i=1
 while i<len(d)+1:	#use i and j to iterate through the combinations
-    list1=d[i]
-    j=i+1
-    while j<len(d)+1:
-    	list2=d[j]
+	list1=d[i]
+	j=i+1
+	while j<len(d)+1:
+		list2=d[j]
 		#print "i", i, list1, " vs ",
 		#print "j", j, list2
-    	if set(list1) & (set(list2)): # if there is an intersection
+		if set(list1) & (set(list2)): # if there is an intersection
 			#print "yes there is", list1, list2
-    		union=list(set(list2) | set(list1))
-    		d[j]=union
-    		d[i]=[] #...and empty the redundant list
-    	j=j+1
-    i=i+1
+			union=list(set(list2) | set(list1))
+			d[j]=union
+			d[i]=[] #...and empty the redundant list
+		j=j+1
+	i=i+1
 
 
 #print("==")
@@ -939,21 +984,6 @@ for line in acclists:
 		outfile_des.write ("\n\n")
 
 
-import random
-from random import randint
-import colorsys
-
-def random_color(h=None):
-	"""Generates a random color in RGB format."""
-	if not h:
-		c = random.random()
-	d = 0.5
-	e = 0.5
-	return _hls2hex(c, d, e)
-
-def _hls2hex(c, d, e):
-	return '#%02x%02x%02x' %tuple(map(lambda f: int(f*255),colorsys.hls_to_rgb(c, d, e)))
-
 familyDict={} # Accession:Assigned family Number from Jackhammer
 with open(args.out_prefix+'_flankgene.fasta_cluster_out_'+iters+'_'+evthresh+'_clusters.tsv', 'r') as clusterIn:
 	for line in clusterIn:
@@ -972,10 +1002,14 @@ for acc in familyDict:
 
 center=int(max(familynum))+1
 noProt=int(max(familynum))+2
-noColor=int(max(familynum))+3
+noProtP=int(max(familynum))+3
+noColor=int(max(familynum))+4
 for ids in LengthDict:
 	if ids.split('#')[0][-1]=='*':
-		familyDict[ids.split('#')[0]]=noProt
+		if ids.split('#')[0][:2].lower()=='ps':
+			familyDict[ids.split('#')[0]]=noProtP
+		else:
+			familyDict[ids.split('#')[0]]=noProt
 	if ids.split('#')[0] not in familyDict:
 		if ids in NqueryDict:
 			#print(ids.split('#')[0])
@@ -986,23 +1020,14 @@ color={}
 color[noColor]='#ffffff'
 color[center]='#000000'
 color[noProt]='#f2f2f2'
-
+color[noProtP]='#f2f2f3'
 colorDict={} #Assigned family Number from Jackhammer : colorcode
 for families in set(familynum):
 	if families == 0:
 		colorDict[families]=str('#ffffff')
 	else:
-		if random_color()!='#ffffff' or random_color()!='#000000' or random_color()!='#f2f2f2' :
+		if random_color()!='#ffffff' or random_color()!='#000000' or random_color()!='#f2f2f2' or random_color()!='#f2f2f3' :
 			colorDict[families]=random_color()
-
-
-def outliner (item):
-	if item =='#ffffff':
-		return '#bebebe'
-	elif item =='#f2f2f2':
-		return '#008000'
-	else:
-		return item
 
 colorDict.update(color)
 
@@ -1086,6 +1111,8 @@ if not args.tree:
 			return ' '
 		elif item==noProt:
 			return ' '
+		elif item==noProtP:
+			return ' '
 		elif item==noColor:
 			return ' '
 		else:
@@ -1104,8 +1131,8 @@ if not args.tree:
 			ptnstats=entries[0].split("\t")
 			org=ptnstats[0].replace("_"," ")
 			textspace=widthM/2
-			line_pos_y=line_pos_y+16
-			half_dom_height=5
+			line_pos_y=line_pos_y+16-round(postscriptSize(newQ))
+			half_dom_height=5-round(postscriptSize(newQ))
 			text = canvas.create_text(textspace/2,line_pos_y, text=org, fill="#404040", font=("Arial", "12"))
 			for entry in entries:
 				items=entry.split("\t")
@@ -1130,7 +1157,10 @@ if not args.tree:
 
 if args.tree:###Tree Command###
 	tree_file= args.out_prefix+'_tree.fasta'
-	tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full" %(tree_file, tree_file[:-6])
+	if args.cpu:
+		tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full --rename-dup-seqnames --cpu %s" %(tree_file, tree_file[:-6], core)
+	else:
+		tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full --rename-dup-seqnames" %(tree_file, tree_file[:-6])
 	#print(tree_command)
 	os.system(tree_command)
 	from ete3 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
@@ -1147,6 +1177,8 @@ if args.tree:###Tree Command###
 		elif item==center:
 			return ' '
 		elif item==noProt:
+			return ' '
+		elif item==noProtP:
 			return ' '
 		elif item==noColor:
 			return ' '
@@ -1321,6 +1353,8 @@ if args.tree and args.tree_order:
 			return ' '
 		elif item==noProt:
 			return ' '
+		elif item==noProtP:
+			return ' '
 		elif item==noColor:
 			return ' '
 		else:
@@ -1339,8 +1373,8 @@ if args.tree and args.tree_order:
 			ptnstats=entries[0].split("\t")
 			org=ptnstats[0].replace("_"," ")
 			textspace=widthM/2
-			line_pos_y=line_pos_y+16
-			half_dom_height=5
+			line_pos_y=line_pos_y+16-round(postscriptSize(newQ))
+			half_dom_height=5-round(postscriptSize(newQ))
 			text = canvas.create_text(textspace/2,line_pos_y, text=org, fill="#404040", font=("Arial", "12"))
 			for entry in entries:
 				items=entry.split("\t")
