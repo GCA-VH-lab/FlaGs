@@ -5,7 +5,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein, IUPAC
 import random
-import math
+import math, re
 import argparse
 import ftplib
 import random
@@ -18,7 +18,7 @@ from collections import OrderedDict
 from tkinter import *
 master = Tk()
 import subprocess
-Entrez.email = "chayan.sust7@gmail.com"
+
 
 usage= ''' Description:  Identify flanking genes and cluster them based on similarity and visualize the structure; Requirement= Python3, BioPython; tkinter ; Optional Requirement= ETE3. '''
 
@@ -39,11 +39,13 @@ parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate 
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.7')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.8')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
 
+
+Entrez.email = "chayan.sust7@gmail.com"
 
 def random_color(h=None):
 	"""Generates a random color in RGB format."""
@@ -229,21 +231,18 @@ def accession_from_wp(accession_nr):
 		return False
 	record = list(Entrez.parse(handle))
 	handle.close()
-	if len(record)>0:
-		if "ProteinList" in record[0]:
-			for keys in (record[0]["ProteinList"]):
-				assembly=[]
-				if "CDSList" in keys:
-					for item in keys["CDSList"]:
-						if "assembly" in item.attributes :
-							assembly.append(item.attributes["assembly"])
-					return set(assembly)
-				else:
-					return("NAI")
-		else:
-			return("NAI")
+	item=str(record).split(',')
+	assembly=set()
+	for elements in item:
+		if 'assembly' in elements:
+			assemblyId=elements.split(':')[1].replace(')','').replace('}','').replace(']','').replace(' ','').replace("'",'')
+			assembly.add(assemblyId)
+	if len(assembly)>0:
+		return (assembly)
 	else:
 		return("NAI")
+
+
 
 def seq_from_wp(accession_nr):
 	"""
@@ -437,10 +436,11 @@ if not args.localGenomeList:
 			else:
 				if query[0][0]!='X' and query[0][1:3]=='P_':
 					asset=set()
-					if len(accession_from_wp(query[0]))>0:
-						for elements in accession_from_wp(query[0]):
-							if query[1]==elements:
-								asset.add(query[1])
+					if accession_from_wp(query[0]):
+						if len(accession_from_wp(query[0]))>0:
+							for elements in accession_from_wp(query[0]):
+								if query[1]==elements:
+									asset.add(query[1])
 					queryDict[query[0]+'#'+str(q)]=asset
 				elif query[0][:2]=='XP':
 					asset=set()
@@ -566,6 +566,16 @@ desDict={}
 acc_CGF_Dict={}
 
 
+def getGeneId(item):
+	matchObject = re.search('(GeneID:.*?,)', item)
+	return matchObject.group(1)[:-1]
+
+def getGeneId_gene(item):
+	matchObject2 = re.search('(GeneID:.*;)', item)
+	return matchObject2.group(1).split(';')[0]
+
+
+
 count=0
 for query in NqueryDict:
 	count+=1
@@ -597,16 +607,32 @@ for query in NqueryDict:
 										Line=line.decode('utf-8').rstrip().split('\t')
 										if Line[2]=='CDS':
 											if Line[8].split(';')[3][:5]=='Name=': #eliminates pseudo gene as they don't have 'Name='
-												geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
-												geneChrom[Line[8].split(';')[1].split('=')[1]]=Line[0]
+												if 'GeneID:' in Line[8]:
+													geneProt[getGeneId(Line[8])]=Line[8].split(';')[3].split('=')[1]
+													geneChrom[getGeneId(Line[8])]=Line[0]
+													#print(getGeneId(Line[8]), Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
+												else:
+													#print(Line[8].split(';')[1].split('=')[1], Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
+													geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
+													geneChrom[Line[8].split(';')[1].split('=')[1]]=Line[0]
+													##print(geneProt)>'GeneID:187667': 'NP_493855.2'
 										if Line[2][-4:]=='gene':
 											a+=1
-											newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
-											LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
-											for genDes in Line[8].split(';'):
-												if 'gene_biotype=' in genDes:
-													if Line[8].split(';')[0][3:] not in geneProt:
-														geneProt[Line[8].split(';')[0][3:]]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
+											if 'GeneID:' in Line[8]:
+												newGene=str(a)+'\t'+getGeneId_gene(Line[8])+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
+												#print(newGene) #1	GeneID:353377	3747	3909	-	NC_003279.8
+												LineList.append(newGene.split('\t'))
+												for genDes in Line[8].split(';'):
+													if 'gene_biotype=' in genDes:
+														if getGeneId_gene(Line[8]) not in geneProt:
+															geneProt[getGeneId_gene(Line[8])]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
+											else:
+												newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
+												LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
+												for genDes in Line[8].split(';'):
+													if 'gene_biotype=' in genDes:
+														if Line[8].split(';')[0][3:] not in geneProt:
+															geneProt[Line[8].split(';')[0][3:]]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
 								geneList=[] ##List of gene names coding same protein (accession), we are taking one from them
 								for genes in geneProt:
 									if query.split('#')[0]==geneProt[genes]:
@@ -617,8 +643,10 @@ for query in NqueryDict:
 										rangeList.append(int(LineList[LineList.index(line)][0]))
 								for genes in geneProt:
 									if genes==geneList[0]:
+										#print(query.split('#')[0], geneProt[genes])
 										if query.split('#')[0]==geneProt[genes]:
 											for line in LineList:
+												#print(genes, line[1])
 												if genes==line[1]:
 													FoundDict[query]='Yes'
 													speciesDict[query]=accnr_list_dict[item].split('\t')[0]
@@ -705,16 +733,32 @@ for query in NqueryDict:
 							Line=line.decode('utf-8').rstrip().split('\t')
 							if Line[2]=='CDS':
 								if Line[8].split(';')[3][:5]=='Name=': #eliminates pseudo gene as they don't have 'Name='
-									geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
-									geneChrom[Line[8].split(';')[1].split('=')[1]]=Line[0]
+									if 'GeneID:' in Line[8]:
+										geneProt[getGeneId(Line[8])]=Line[8].split(';')[3].split('=')[1]
+										geneChrom[getGeneId(Line[8])]=Line[0]
+										#print(getGeneId(Line[8]), Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
+									else:
+										#print(Line[8].split(';')[1].split('=')[1], Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
+										geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
+										geneChrom[Line[8].split(';')[1].split('=')[1]]=Line[0]
+										##print(geneProt)>'GeneID:187667': 'NP_493855.2'
 							if Line[2][-4:]=='gene':
 								a+=1
-								newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
-								LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
-								for genDes in Line[8].split(';'):
-									if 'gene_biotype=' in genDes:
-										if Line[8].split(';')[0][3:] not in geneProt:
-											geneProt[Line[8].split(';')[0][3:]]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
+								if 'GeneID:' in Line[8]:
+									newGene=str(a)+'\t'+getGeneId_gene(Line[8])+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
+									#print(newGene) #1	GeneID:353377	3747	3909	-	NC_003279.8
+									LineList.append(newGene.split('\t'))
+									for genDes in Line[8].split(';'):
+										if 'gene_biotype=' in genDes:
+											if getGeneId_gene(Line[8]) not in geneProt:
+												geneProt[getGeneId_gene(Line[8])]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
+								else:
+									newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
+									LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
+									for genDes in Line[8].split(';'):
+										if 'gene_biotype=' in genDes:
+											if Line[8].split(';')[0][3:] not in geneProt:
+												geneProt[Line[8].split(';')[0][3:]]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
 					geneList=[] ##List of gene names coding same protein (accession), we are taking one from them
 					for genes in geneProt:
 						if query.split('#')[0]==geneProt[genes]:
