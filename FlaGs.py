@@ -39,7 +39,7 @@ parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate 
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.8')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.9')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
@@ -607,9 +607,10 @@ for query in NqueryDict:
 										Line=line.decode('utf-8').rstrip().split('\t')
 										if Line[2]=='CDS':
 											if Line[8].split(';')[3][:5]=='Name=': #eliminates pseudo gene as they don't have 'Name='
-												if 'GeneID:' in Line[8]:
-													geneProt[getGeneId(Line[8])]=Line[8].split(';')[3].split('=')[1]
-													geneChrom[getGeneId(Line[8])]=Line[0]
+												if query.split('_')[0]=='XP':
+													if 'GeneID:' in Line[8]:
+														geneProt[getGeneId(Line[8])]=Line[8].split(';')[3].split('=')[1]
+														geneChrom[getGeneId(Line[8])]=Line[0]
 													#print(getGeneId(Line[8]), Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
 												else:
 													#print(Line[8].split(';')[1].split('=')[1], Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
@@ -618,14 +619,15 @@ for query in NqueryDict:
 													##print(geneProt)>'GeneID:187667': 'NP_493855.2'
 										if Line[2][-4:]=='gene':
 											a+=1
-											if 'GeneID:' in Line[8]:
-												newGene=str(a)+'\t'+getGeneId_gene(Line[8])+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
-												#print(newGene) #1	GeneID:353377	3747	3909	-	NC_003279.8
-												LineList.append(newGene.split('\t'))
-												for genDes in Line[8].split(';'):
-													if 'gene_biotype=' in genDes:
-														if getGeneId_gene(Line[8]) not in geneProt:
-															geneProt[getGeneId_gene(Line[8])]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
+											if query.split('_')[0]=='XP':
+												if 'GeneID:' in Line[8]:
+													newGene=str(a)+'\t'+getGeneId_gene(Line[8])+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
+													#print(newGene) #1	GeneID:353377	3747	3909	-	NC_003279.8
+													LineList.append(newGene.split('\t'))
+													for genDes in Line[8].split(';'):
+														if 'gene_biotype=' in genDes:
+															if getGeneId_gene(Line[8]) not in geneProt:
+																geneProt[getGeneId_gene(Line[8])]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
 											else:
 												newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
 												LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
@@ -733,10 +735,11 @@ for query in NqueryDict:
 							Line=line.decode('utf-8').rstrip().split('\t')
 							if Line[2]=='CDS':
 								if Line[8].split(';')[3][:5]=='Name=': #eliminates pseudo gene as they don't have 'Name='
-									if 'GeneID:' in Line[8]:
-										geneProt[getGeneId(Line[8])]=Line[8].split(';')[3].split('=')[1]
-										geneChrom[getGeneId(Line[8])]=Line[0]
-										#print(getGeneId(Line[8]), Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
+									if query.split('_')[0]=='XP':
+										if 'GeneID:' in Line[8]:
+											geneProt[getGeneId(Line[8])]=Line[8].split(';')[3].split('=')[1]
+											geneChrom[getGeneId(Line[8])]=Line[0]
+											#print(getGeneId(Line[8]), Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
 									else:
 										#print(Line[8].split(';')[1].split('=')[1], Line[8].split(';')[3].split('=')[1], Line[0], 'gpc#')
 										geneProt[Line[8].split(';')[1].split('=')[1]]=Line[8].split(';')[3].split('=')[1]
@@ -744,14 +747,15 @@ for query in NqueryDict:
 										##print(geneProt)>'GeneID:187667': 'NP_493855.2'
 							if Line[2][-4:]=='gene':
 								a+=1
-								if 'GeneID:' in Line[8]:
-									newGene=str(a)+'\t'+getGeneId_gene(Line[8])+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
-									#print(newGene) #1	GeneID:353377	3747	3909	-	NC_003279.8
-									LineList.append(newGene.split('\t'))
-									for genDes in Line[8].split(';'):
-										if 'gene_biotype=' in genDes:
-											if getGeneId_gene(Line[8]) not in geneProt:
-												geneProt[getGeneId_gene(Line[8])]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
+								if query.split('_')[0]=='XP':
+									if 'GeneID:' in Line[8]:
+										newGene=str(a)+'\t'+getGeneId_gene(Line[8])+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
+										#print(newGene) #1	GeneID:353377	3747	3909	-	NC_003279.8
+										LineList.append(newGene.split('\t'))
+										for genDes in Line[8].split(';'):
+											if 'gene_biotype=' in genDes:
+												if getGeneId_gene(Line[8]) not in geneProt:
+													geneProt[getGeneId_gene(Line[8])]=genDes.split('=')[1]+'_'+query.split('#')[1]+'.'+str(random.randint(0,int(s)*2-1))+'*'
 								else:
 									newGene=str(a)+'\t'+Line[8].split(';')[0][3:]+'\t'+ Line[3]+'\t'+Line[4]+'\t'+ Line[6]+ '\t'+ Line[0]
 									LineList.append(newGene.split('\t')) #1       gene3006        10266   10342   -       NZ_FPCC01000034.1
