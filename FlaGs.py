@@ -26,6 +26,7 @@ usage= ''' Description:  Identify flanking genes and cluster them based on simil
 parser = argparse.ArgumentParser(description=usage)
 parser.add_argument("-a", "--assemblyList", help=" Protein Accession with assembly Identifier eg. GCF_000001765.3 in a text file separated by newline. ")
 parser.add_argument("-p", "--proteinList", help=" Protein Accession eg. XP_ or WP_047256880.1 in a text file separated by newline. ")
+parser.add_argument("-u", "--user_email", required=True, action="append", metavar="RECIPIENT",default=[], dest="recipients", help=" User Email Address (at least one required) ")
 parser.add_argument("-l", "--localGenomeList", help=" Genome File name and Protein Accession ")
 parser.add_argument("-ld", "--localGenomeDirectory", help=" Path for Local Files, Default directory is './' which is the same directory where the script is located or running from. ")
 parser.add_argument("-r", "--redundant",action="store_true", help=" Search all GCFs for each query. ")
@@ -39,13 +40,16 @@ parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate 
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.0.9')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.1.0')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
 
 
-Entrez.email = "chayan.sust7@gmail.com"
+
+Entrez.email = args.recipients[0]
+
+print(Entrez.email, args.recipients[0])
 
 def random_color(h=None):
 	"""Generates a random color in RGB format."""
@@ -1140,8 +1144,9 @@ if not args.tree:
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*20
 	#aheightM=heightM*1.3
+	#master = Tk()
 
-	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5))
+	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,round(widthM*2.5),round(heightM*2.5)))
 	hbar=Scrollbar(master,orient=HORIZONTAL)
 	hbar.pack(side=BOTTOM,fill=X)
 	hbar.config(command=canvas.xview)
@@ -1206,9 +1211,9 @@ if not args.tree:
 if args.tree:###Tree Command###
 	tree_file= args.out_prefix+'_tree.fasta'
 	if args.cpu:
-		tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full --rename-dup-seqnames --cpu %s" %(tree_file, tree_file[:-6], core)
+		tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full --rename-dup-seqnames --cpu %s" %(tree_file, tree_file[:-6], core)
 	else:
-		tree_command=tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full --rename-dup-seqnames" %(tree_file, tree_file[:-6])
+		tree_command="ete3 build -a %s -o %s --clearall -w mafft_default-trimal01-none-fasttree_full --rename-dup-seqnames" %(tree_file, tree_file[:-6])
 	#print(tree_command)
 	os.system(tree_command)
 	from ete3 import Tree, SeqMotifFace, TreeStyle, add_face_to_node
@@ -1382,9 +1387,9 @@ if args.tree and args.tree_order:
 	widthM=(windowMost*3)+500
 	heightM=int(newQ)*20
 	#aheightM=heightM*1.3
+	#master = Tk()
 
-
-	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,widthM*2.5,heightM*2.5))
+	canvas = Canvas(master, width=widthM,height=heightM,background='white', scrollregion=(0,0,round(widthM*2.5),round(heightM*2.5)))
 	hbar=Scrollbar(master,orient=HORIZONTAL)
 	hbar.pack(side=BOTTOM,fill=X)
 	hbar.config(command=canvas.xview)
