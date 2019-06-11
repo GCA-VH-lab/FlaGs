@@ -47,7 +47,7 @@ parser.parse_args()
 
 Entrez.email = args.recipients[0]
 
-print(Entrez.email, args.recipients[0])
+#print(Entrez.email, args.recipients[0])
 
 def random_color(h=None):
 	"""Generates a random color in RGB format."""
