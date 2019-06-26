@@ -1,5 +1,7 @@
-#Author: Chayan Kumar Saha, Gemma C. Atkinson
-#
+__author__		= "Chayan Kumar Saha, Gemma C. Atkinson"
+__copyright__	= "GNU General Public License v3.0"
+__email__		= "chayan.sust7@gmail.com"
+
 from Bio import SeqIO
 from Bio import Entrez
 from Bio.Seq import Seq
@@ -27,7 +29,6 @@ usage= ''' Description:  Identify flanking genes and cluster them based on simil
 parser = argparse.ArgumentParser(description=usage)
 parser.add_argument("-a", "--assemblyList", help=" Protein Accession with assembly Identifier eg. GCF_000001765.3 in a text file separated by newline. ")
 parser.add_argument("-p", "--proteinList", help=" Protein Accession eg. XP_ or WP_047256880.1 in a text file separated by newline. ")
-parser.add_argument("-u", "--user_email", required=True, action="append", metavar="RECIPIENT",default=[], dest="recipients", help=" User Email Address (at least one required) ")
 parser.add_argument("-l", "--localGenomeList", help=" Genome File name and Protein Accession ")
 parser.add_argument("-ld", "--localGenomeDirectory", help=" Path for Local Files, Default directory is './' which is the same directory where the script is located or running from. ")
 parser.add_argument("-r", "--redundant",action="store_true", help=" Search all GCFs for each query. ")
@@ -38,10 +39,12 @@ parser.add_argument("-t", "--tree", action="store_true", help=" If you want to s
 parser.add_argument("-ts", "--tshape", help=" Size of triangle shapes that represent flanking genes, this option only works when -t is used. Default = 12 ")
 parser.add_argument("-tf", "--tfontsize", help=" Size of font inside triangles that represent flanking genes, this option only works when -t is used. Default = 4 ")
 parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate Output with Tree, and then use the tree order to generate other view. ")
+parser.add_argument("-u", "--user_email", required=True, action="append", metavar="RECIPIENT",default=[], dest="recipients", help=" User Email Address (at least one required) ")
+parser.add_argument("-api", "--api_key", help=" NCBI API Key, To get this key kindly heck https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/ ")
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.1.0')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.1.1')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
@@ -49,6 +52,14 @@ parser.parse_args()
 
 
 Entrez.email = args.recipients[0]
+
+if not args.localGenomeList:
+	if args.api_key:
+		Entrez.api_key = args.api_key
+else:
+	if args.api_key:
+		print('Since FlaGs will use Local Data api_key is not necessary, Thanks!')
+		sys.exit()
 
 #print(Entrez.email, args.recipients[0])
 
@@ -411,7 +422,7 @@ if not args.localGenomeList:
 	accnr_list_dict.update(accnr_list_dict_gen)
 	assemblyName.update(assemblyName_GCA)
 
-	print ('\n'+ '>> Database Downloaded. Work in progress ...'+ '\n')
+	print ('\n'+ '>> Database Downloaded. Cross-checking of the accession list in progress ...'+ '\n')
 
 
 
@@ -958,11 +969,13 @@ for seqids in sorted(seqDict):
 		lines=part.splitlines()
 		acclist=[]
 		for line in lines:
-			inc=line.split()[17]
-			#acc=line.split("|")[-3].split(" ")[0]
-			acc=line.split('|')[0]
-			if inc=="1":
-				acclist.append(acc)
+			lineList=line.split()
+			if len(lineList)>17:
+				inc=line.split()[17]
+				#acc=line.split("|")[-3].split(" ")[0]
+				acc=line.split('|')[0]
+				if inc=="1":
+					acclist.append(acc)
 		outacclists.write(str(i)+"\t"+str(acclist)+"\n")
 		i=i+1
 
@@ -1455,4 +1468,5 @@ if args.tree and args.tree_order:
 
 
 print('\n'+'<<< Done >>>')
+print('For FlaGs Citation: https://www.biorxiv.org/content/10.1101/362095v1')
 sys.exit()
