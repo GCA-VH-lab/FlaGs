@@ -40,7 +40,7 @@ parser.add_argument("-ts", "--tshape", help=" Size of triangle shapes that repre
 parser.add_argument("-tf", "--tfontsize", help=" Size of font inside triangles that represent flanking genes, this option only works when -t is used. Default = 4 ")
 parser.add_argument("-to", "--tree_order", action="store_true", help=" Generate Output with Tree, and then use the tree order to generate other view. ")
 parser.add_argument("-u", "--user_email", required=True, action="append", metavar="RECIPIENT",default=[], dest="recipients", help=" User Email Address (at least one required) ")
-parser.add_argument("-api", "--api_key", help=" NCBI API Key, To get this key kindly heck https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/ ")
+parser.add_argument("-api", "--api_key", help=" NCBI API Key, To get this key kindly check https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/ ")
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
