@@ -44,7 +44,7 @@ parser.add_argument("-api", "--api_key", help=" NCBI API Key, To get this key ki
 parser.add_argument("-o", "--out_prefix", required= True, help=" Any Keyword to define your output eg. MyQuery ")
 parser.add_argument("-c", "--cpu", help="Maximum number of parallel CPU workers to use for multithreads. ")
 parser.add_argument("-k", "--keep", action="store_true", help=" If you want to keep the intermediate files eg. gff3 use [-k]. By default it will remove. ")
-parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.1.1')
+parser.add_argument("-v", "--version", action="version", version='%(prog)s 1.1.2')
 parser.add_argument("-vb", "--verbose", action="store_true", help=" Use this option to see the work progress for each query as stdout. ")
 args = parser.parse_args()
 parser.parse_args()
