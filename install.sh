@@ -5,10 +5,10 @@
 ### install.sh workflow
 
 
-## For Mac (tested in MacBook Pro 2019 macOS Catalina v10.15.4): - If wget is installed, it installs anaconda, hmmer, biopython and ete3
+## For Mac (tested with MacBook Pro 2019 macOS Catalina v10.15.4): - If wget is installed, it installs anaconda, hmmer, biopython and ete3
 ##			- If wget is not installed, it installs brew and then installs wget and
 ##			after that it proceeds for installing the rest required for FlaGs
-## For Linux (tested in Ubuntu 16.04.6 LTS): - If wget is installed, it installs anaconda, hmmer, biopython and ete3
+## For Linux (tested with Ubuntu 16.04.6 LTS): - If wget is installed, it installs anaconda, hmmer, biopython and ete3
 ##			- If wget is not installed, it asks user to install wget and to try it again
 
 
