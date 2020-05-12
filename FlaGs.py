@@ -297,7 +297,7 @@ def accession_from_wp(accession_nr):
 	#Entrez.email = "_@gmail.com"  # If you do >3 entrez searches on NCBI per second, your ip will be
 	# blocked, warning is sent to this email.
 	try:
-		#time.sleep(1)
+		time.sleep(0.4)
 		handle = Entrez.efetch(db="protein", id=accession_nr, rettype="ipg", retmode="xml")
 		if float(checkBioPython())<=1.72:
 			record = list(Entrez.parse(handle))
