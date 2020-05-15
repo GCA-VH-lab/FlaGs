@@ -52,7 +52,9 @@ parser.parse_args()
 
 print('\nStarting FlaGs version 1.2.3 \nPlease only run one instance of FlaGs at a time to avoid making more queries than NCBI’s limit.')
 print('For more information, please check https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/ \n')
+print('Checking for RefSeq and Genbank summary files and downloading if needed… \n')
 
+Entrez.tool = 'FlaGs'
 ncbi_time=0.4
 timeout = 10
 socket.setdefaulttimeout(timeout)
