@@ -745,7 +745,7 @@ if not args.localGenomeList:
 										ne+=1
 										print(query[0], file= fbad)
 						if args.redundant:
-							if exceptionalWP_out[:3]=='WP_':
+							if exceptionalWP_out[1:3]=='P_':
 								accession_from_wp_exceptional=accession_from_wp(exceptionalWP_out)
 								if accession_from_wp_exceptional:
 									asset=set()
