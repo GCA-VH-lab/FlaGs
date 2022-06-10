@@ -6,7 +6,7 @@ from Bio import SeqIO
 from Bio import Entrez
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein, IUPAC
+# from Bio.Alphabet import generic_protein, IUPAC
 import math, re
 import argparse
 import ftplib
