@@ -321,11 +321,11 @@ def accession_from_wp(accession_nr):
 			changedtimeout = 10*variableIsquare  #10-250 seconds (when i =1 , changedtimeout= 10*1 =10 | when i=2,  changedtimeout= 10 * 2square =40 )
 			socket.setdefaulttimeout(changedtimeout)
 			time.sleep(ncbi_time)
-			handle = Entrez.efetch(db="protein", id=accession_nr, rettype="ipg", retmode="xml")
+			handle = Entrez.efetch(db="ipg", id=accession_nr, rettype="ipg", retmode="xml")
 			if handle:
 				retry=False
 				if float(checkBioPython())<=1.72:
-					record = list(Entrez.parse(handle))
+					record = list(Entrez.read(handle, validate=False))
 					handle.close()
 					assembly = re.findall("GC._\d*\.\d", str(record))
 					if assembly and len(assembly)>0:
@@ -333,7 +333,7 @@ def accession_from_wp(accession_nr):
 					else:
 						return {'NAI'}
 				else:
-					record = Entrez.read(handle)
+					record = Entrez.read(handle, validate=False)
 					handle.close()
 					assembly = re.findall("GC._\d*\.\d", str(record['IPGReport']))
 					if assembly and len(assembly)>0:
